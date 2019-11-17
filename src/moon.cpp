@@ -3,10 +3,9 @@
 
 #include "moon.h"
 
-using namespace std;
-
 int main()
 {
-	cout << "Hello CMake." << endl;
-	return 0;
+	std::cout << "Hello Moon!" << std::endl;
+	
+	return OK;
 }
