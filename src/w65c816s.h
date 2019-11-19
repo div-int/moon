@@ -7,15 +7,16 @@ class W65C816S {
 public:
 	enum class STATUSBITS
 	{
-		N = 1 << 7,
-		V = 1 << 6,
-		M = 1 << 5,
-		X = 1 << 4,
-		D = 1 << 3,
-		I = 1 << 2,
-		Z = 1 << 1,
-		C = 1 << 0,
-		E = 1 << 0,
+		N = 1 << 7,		// Negative 1 = negative
+		V = 1 << 6,		// Overflow 1 = true
+		M = 1 << 5,		// Memory Select 1 = 8-bit 0 = 16-bit
+		X = 1 << 4,		// Index Register Select 1 = 8-bit 0 = 16-bit
+		B = 1 << 4,		// BRK Bit 1 = BRK 0 = IRQ
+		D = 1 << 3,		// Decimal Mode 1 = true
+		I = 1 << 2,		// IRQ Disable 1 = disable
+		Z = 1 << 1,		// Zero 1 = zero result
+		C = 1 << 0,		// Carry 1 = true
+		E = 1 << 0,		// Emulation
 	};
 
 	typedef std::shared_ptr<W65C816S> SharedPtr;
