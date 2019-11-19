@@ -21,6 +21,8 @@ public:
 
 	typedef std::shared_ptr<W65C816S> SharedPtr;
 
+	typedef uint8_t Register8;
+
 	typedef union {
 		uint32_t word;
 		struct {
@@ -34,18 +36,19 @@ public:
 			uint8_t byte_padding;
 		};
 
-	} Register;
+	} Register24;
 
 private:
 	Bus::SharedPtr bus;
 	olc::PixelGameEngine* system;
 
-	Register X;
-	Register Y;
-	Register S;
-	Register A;
-	Register PC;
-	Register D;
+	Register8 PSW;
+	Register24 X;
+	Register24 Y;
+	Register24 S;
+	Register24 A;
+	Register24 PC;
+	Register24 D;
 
 protected:
 
