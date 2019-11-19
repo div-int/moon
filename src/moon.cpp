@@ -6,6 +6,12 @@
 Moon::Moon()
 {
 	sAppName = "Moon";
+
+	bus = new Bus(this);
+
+	test8 = bus->CreateLine8Bit("TEST8", 0xa5);
+	test16 = bus->CreateLine16Bit("TEST16", 0xaa55);
+	test32 = bus->CreateLine32Bit("TEST32", 0xaa55aa55);
 }
 
 Moon::~Moon()
@@ -15,8 +21,6 @@ Moon::~Moon()
 
 bool Moon::OnUserCreate()
 {
-	// TO DO
-
 	pixel_x = 0;
 	pixel_y = 0;
 
@@ -31,6 +35,8 @@ bool Moon::OnUserCreate()
 	screen_buffer_1 = new uint8_t[1024 * 1024];
 	screen_buffer_2 = new uint8_t[1024 * 1024];
 	screen_buffer_3 = new uint8_t[1024 * 1024];
+
+	sprite_buffer = new uint8_t[1024 * 1024];
 
 	for (uint32_t i = 0; i < (1024 * 1024); i++)
 	{
@@ -72,11 +78,7 @@ bool Moon::OnUserDestroy()
 
 bool Moon::OnUserUpdate(float fElapsedTime)
 {
-	// TO DO
-
 	SetDrawTarget(display_buffer);
-
-	// Update pixel location
 
 	pixel_x = 0;
 	pixel_y = 0;
@@ -150,7 +152,7 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 	uint32_t offset;
 	uint32_t pixel_lookup;
 
-	for (int i = 0; i < display_size; i++)
+	for (uint32_t i = 0; i < display_size; i++)
 	{
 		pixel_colour = olc::VERY_DARK_YELLOW;
 
@@ -276,6 +278,10 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 
 	SetDrawTarget(nullptr);
 	DrawSprite(0, 0, display_buffer, display_scale);
+
+	*test32 = GetMouseX();
+
+	bus->Debug();
 
 	return true;
 }
