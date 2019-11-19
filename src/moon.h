@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "bus.h"
+#include "w65c816s.h"
 
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
@@ -28,7 +29,8 @@ public:
 	};
 
 private:
-	Bus* bus;
+	Bus::SharedPtr bus;
+	W65C816S::SharedPtr cpu;
 
 	Bus::Line8Bit test8;
 	Bus::Line16Bit test16;

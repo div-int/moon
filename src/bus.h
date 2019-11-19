@@ -25,6 +25,7 @@ public:
 class Bus
 {
 public:
+	typedef std::shared_ptr<Bus> SharedPtr;
 	typedef std::shared_ptr<uint1_t> Line1Bit;
 	typedef std::shared_ptr<uint8_t> Line8Bit;
 	typedef std::shared_ptr<uint16_t> Line16Bit;

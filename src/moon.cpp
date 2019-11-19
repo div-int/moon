@@ -7,7 +7,8 @@ Moon::Moon()
 {
 	sAppName = "Moon";
 
-	bus = new Bus(this);
+	bus = std::make_shared<Bus>(this);
+	cpu = std::make_shared<W65C816S>(bus, this);
 
 	test8 = bus->CreateLine8Bit("TEST8", 0xa5);
 	test16 = bus->CreateLine16Bit("TEST16", 0xaa55);
