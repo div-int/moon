@@ -10,9 +10,8 @@ Moon::Moon()
 	bus = std::make_shared<Bus>(this);
 	cpu = std::make_shared<W65C816S>(bus, this);
 
-	test8 = bus->CreateLine8Bit("TEST8", 0xa5);
-	test16 = bus->CreateLine16Bit("TEST16", 0xaa55);
-	test32 = bus->CreateLine32Bit("TEST32", 0xaa55aa55);
+	PHI2 = bus->AttachLine1Bit("PHI2");
+	RESB = bus->AttachLine1Bit("RESB");
 }
 
 Moon::~Moon()
@@ -22,6 +21,8 @@ Moon::~Moon()
 
 bool Moon::OnUserCreate()
 {
+	cpu->Start();
+
 	pixel_x = 0;
 	pixel_y = 0;
 
@@ -107,6 +108,20 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 
 	pixel_x_3 = pixel_x_start_3 & 0x3ffffff;
 	pixel_y_3 = pixel_y_start_3 & 0x3ffffff;
+
+	if (GetKey(olc::Key::SPACE).bReleased)
+		*PHI2 = ~(*PHI2);
+
+	if (GetKey(olc::Key::Q).bReleased)
+		cpu->Stop();
+
+	if (GetKey(olc::Key::S).bReleased)
+		cpu->Start();
+
+	if (GetKey(olc::Key::R).bHeld)
+		*RESB = 0b0;
+	else
+		*RESB = 0b1;
 
 	if (GetKey(olc::Key::ESCAPE).bReleased)
 		return false;
@@ -279,8 +294,6 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 
 	SetDrawTarget(nullptr);
 	DrawSprite(0, 0, display_buffer, display_scale);
-
-	*test32 = GetMouseX();
 
 	bus->Debug();
 

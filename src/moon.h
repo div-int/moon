@@ -32,9 +32,8 @@ private:
 	Bus::SharedPtr bus;
 	W65C816S::SharedPtr cpu;
 
-	Bus::Line8Bit test8;
-	Bus::Line16Bit test16;
-	Bus::Line32Bit test32;
+	Bus::Line1Bit PHI2;
+	Bus::Line1Bit RESB;
 
 	uint32_t pixel_x;
 	uint32_t pixel_y;
