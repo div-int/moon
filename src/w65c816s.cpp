@@ -104,6 +104,14 @@ void W65C816S::Clock()
 
 			reset_low = false;
 
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+			*RWB = 0b1;
+
+			address_out = PC;
+
 			return;
 		}
 	}
@@ -116,110 +124,23 @@ void W65C816S::Clock()
 
 		++PC.db0_15;
 		++instruction_cycles;
-		*VDA = 0b1;
-		*VPA = 0b1;
-		*VPB = 0b1;
 
 		return;
 	}
-
-	switch (mode)
+	else
 	{
-	case MODE::EMULATION:
-		switch (instruction_cycles)
-		{
-		case 1:
-			++instruction_cycles;
 
-			switch (IR)
-			{
-			case 0x18: // CLC
-				std::cout << "CLC" << std::endl;
-				CLC();
-				instruction_cycles = 0;
-				break;
-			case 0x38: // SEC
-				std::cout << "SEC" << std::endl;
-				SEC();
-				instruction_cycles = 0;
-				break;
-			case 0x69: // ADC #immediate
-				*VDA = 0b0;
-				++PC.db0_15;
-				fetched = data_in;
-				break;
-			case 0xfb: // XCE
-				std::cout << "XCE" << std::endl;
-				XCE();
-				instruction_cycles = 0;
-				break;
-			}
-		case 2:
-			switch (IR)
-			{
-			case 0x69:
-				std::cout << "ADC #" << std::hex << std::setw(2) << std::setfill('0') << unsigned(data_in) << std::endl;
-				ADC_IMM_8(data_in);
-				instruction_cycles = 0;
+	}
 
-				break;
-			}
-		}
-		break;
+	if (instruction_cycles == 0)
+	{
+		*VPB = 0b1;
+		*MLB = 0b1;
+		*VDA = 0b1;
+		*VPA = 0b1;
+		*RWB = 0b1;
 
-	case MODE::NATIVE:
-		switch (instruction_cycles)
-		{
-		case 1:
-			++instruction_cycles;
-
-			switch (IR)
-			{
-			case 0x69: //  // immediate fetch low byte
-				*VDA = 0b0;
-				++PC.db0_15;
-				fetched = data_in;
-
-				break;
-			}
-			break;
-
-		case 2:
-			++instruction_cycles;
-
-			switch (IR)
-			{
-			case 0x69: // immediate fetch high byte
-				*VDA = 0b0;
-
-				if (GetM() == 0b1) // if using 8 bit accumulator register
-				{
-					std::cout << "ADC #" << std::hex << std::setw(2) << std::setfill('0') << unsigned(fetched) << std::endl;
-					ADC_IMM_8(fetched);
-					instruction_cycles = 0;
-				}
-				else
-				{
-					++PC.db0_15;
-					fetched |= ((uint16_t)data_in) << 8;
-				}
-
-				break;
-			}
-			break;
-
-		case 3:
-			++instruction_cycles;
-
-			switch (IR)
-			{
-			case 0x69: // ADC #immediate_16
-				std::cout << "ADC #" << std::hex << std::setw(4) << std::setfill('0') << unsigned(fetched) << std::endl;
-				ADC_IMM_16(fetched);
-				instruction_cycles = 0;
-			}
-		}
-		break;
+		address_out = PC;
 	}
 }
 

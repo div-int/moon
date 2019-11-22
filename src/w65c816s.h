@@ -183,6 +183,7 @@ private:
 
 	MODE mode;
 
+	Register24 address_out;
 	Register8 data_in;
 	Register8 data_out;
 
@@ -286,27 +287,73 @@ public:
 
 	// Opcode functions
 
-	inline void ADC_IMM_8(uint8_t immediate)
+	inline void CLC()
 	{
-		uint8_t PA = A.b0_7;
+		++PC.db0_15;
+		address_out = PC;
 
-		A.b0_7 += immediate + GetC();
-
-		if (A.b0_7 < PA)
-			SetC();
+		ClearC();
+		
+		instruction_cycles = 0;
 	}
 
-	inline void ADC_IMM_16(uint16_t immediate)
+	inline void CLD()
 	{
-		uint8_t PA = A.db0_15;
+		++PC.db0_15;
+		address_out = PC;
 
-		A.db0_15 += immediate + GetC();
-
-		if (A.db0_15 < PA)
-			SetC();
+		ClearD();
+		
+		instruction_cycles = 0;
 	}
 
-	inline void CLC() { ClearC(); }
-	inline void SEC() { SetC(); }
-	inline void XCE() { GetC() ? SetE() : ClearE(); }
+	inline void CLI()
+	{
+		++PC.db0_15;
+		address_out = PC;
+
+		ClearI();
+		
+		instruction_cycles = 0;
+	}
+
+	inline void SEC()
+	{
+		++PC.db0_15;
+		address_out = PC;
+
+		SetC();
+		
+		instruction_cycles = 0;
+	}
+
+	inline void SED()
+	{
+		++PC.db0_15;
+		address_out = PC;
+
+		SetD();
+		
+		instruction_cycles = 0;
+	}
+
+	inline void SEI()
+	{
+		++PC.db0_15;
+		address_out = PC;
+
+		SetI();
+		
+		instruction_cycles = 0;
+	}
+
+	inline void XCE()
+	{
+		++PC.db0_15;
+		address_out = PC;
+
+		GetC() ? SetE() : ClearE();
+		
+		instruction_cycles = 0;
+	}
 };
