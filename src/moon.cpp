@@ -22,6 +22,7 @@ Moon::~Moon()
 bool Moon::OnUserCreate()
 {
 	cpu->Start();
+	bus->Start();
 
 	pixel_x = 0;
 	pixel_y = 0;

@@ -3,6 +3,7 @@
 Bus::Bus(olc::PixelGameEngine* system)
 {
 	this->system = system;
+	running = false;
 }
 
 Bus::~Bus()
@@ -87,8 +88,72 @@ uint32_t Bus::Read(uint32_t address)
 			return busDevice->Read(address);
 	}
 
-	return 0x12345678;
+	if (address == 0x0000fffc)
+		return 0x38;
+	if (address == 0x0000fffd)
+		return 0x18;
+	if (address == 0x0000fffe)
+		return 0xfb;
+	if (address == 0x0000ffff)
+		return 0x69;
+	if (address == 0x00000000)
+		return 0x34;
+	if (address == 0x00000001)
+		return 0x12;
+
+	return address;
 }
+
+void Bus::Run()
+{
+	uint32_t address = 0x00332211;
+	uint32_t data_in = 0xaa55aa55;
+	uint32_t data_out = 0x55aa55aa;
+
+	while (running)
+	{
+		while (*PHI2 != 0b0) {
+			address = (uint32_t)*A0_A15 | ((uint32_t)(*D0_D7) << 16);
+
+			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
+		}
+
+		data_out = Read(address);
+
+		while (*PHI2 == 0b0) {
+			if (*RWB == 0b0)
+				data_in = *D0_D7;
+			if (*RWB == 0b1)
+				*D0_D7 = data_out;
+
+			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
+		}
+
+		Write(address, data_in);
+	}
+}
+
+void Bus::Start()
+{
+	PHI2 = AttachLine1Bit("PHI2");
+	RWB = AttachLine1Bit("RWB");
+	A0_A15 = AttachLine16Bit("A0_A15");
+	D0_D7 = AttachLine8Bit("D0_D7");
+
+	if (running == false)
+	{
+		running = true;
+
+		std::thread thread_start(&Bus::Run, this);
+		thread_start.detach();
+	}
+}
+
+void Bus::Stop()
+{
+	running = false;
+}
+
 
 void Bus::Debug()
 {

@@ -33,12 +33,18 @@ public:
 
 private:
 	olc::PixelGameEngine* system;
+	bool running;
 
 	std::vector<std::shared_ptr<BusDevice>> busDevices;
 	std::map<std::string, Line1Bit> lines1Bit;
 	std::map<std::string, Line8Bit> lines8Bit;
 	std::map<std::string, Line16Bit> lines16Bit;
 	std::map<std::string, Line32Bit> lines32Bit;
+
+	Bus::Line16Bit A0_A15;
+	Bus::Line8Bit D0_D7;
+	Bus::Line1Bit PHI2;
+	Bus::Line1Bit RWB;
 
 public:
 	Bus(olc::PixelGameEngine* system);
@@ -57,6 +63,10 @@ public:
 
 	void Write(uint32_t address, uint32_t data);
 	uint32_t Read(uint32_t address);
+
+	void Run();
+	void Start();
+	void Stop();
 
 	void Debug();
 };
