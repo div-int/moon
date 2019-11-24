@@ -211,9 +211,10 @@ void W65C816S::Debug()
 
 	stringStream << setfill('0');
 
-	stringStream << "A : " << hex << setw(4) << A.db0_15 << " " << dec << A.db0_15 << std::endl;
-	stringStream << "X : " << hex << setw(4) << X.db0_15 << " " << dec << X.db0_15 << std::endl;
-	stringStream << "Y : " << hex << setw(4) << Y.db0_15 << " " << dec << Y.db0_15 << std::endl;
+	stringStream << "PC : " << hex << setw(2) << setfill('0') << unsigned(PC.b16_23) << ":" << hex << setw(4) << setfill('0') << PC.db0_15 << " \t";
+	stringStream << "A  : " << dec << setw(5) << setfill(' ') << A.db0_15 << " 0x" << hex << setw(4) << setfill('0') << A.db0_15 << " \t";
+	stringStream << "X  : " << dec << setw(5) << setfill(' ') << X.db0_15 << " 0x" << hex << setw(4) << setfill('0') << X.db0_15 << " \t";
+	stringStream << "Y  : " << dec << setw(5) << setfill(' ') << Y.db0_15 << " 0x" << hex << setw(4) << setfill('0') << Y.db0_15 << " \t";
 
 	system->DrawString(9, 9 + (9 * 8), stringStream.str(), olc::BLACK, 1);
 	system->DrawString(7, 7 + (9 * 8), stringStream.str(), olc::BLACK, 1);
