@@ -297,6 +297,7 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 	DrawSprite(0, 0, display_buffer, display_scale);
 
 	bus->Debug();
+	cpu->Debug();
 
 	return true;
 }

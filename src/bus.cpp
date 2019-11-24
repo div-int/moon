@@ -95,10 +95,14 @@ uint32_t Bus::Read(uint32_t address)
 	if (address == 0x0000fffe)
 		return 0xfb;
 	if (address == 0x0000ffff)
-		return 0x69;
+		return 0xc2;
 	if (address == 0x00000000)
-		return 0x34;
+		return 0x30;
 	if (address == 0x00000001)
+		return 0x69;
+	if (address == 0x00000002)
+		return 0x34;
+	if (address == 0x00000003)
 		return 0x12;
 
 	return address;

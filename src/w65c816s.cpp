@@ -83,6 +83,8 @@ void W65C816S::Clock()
 {
 	++clock_count;
 
+	address_out = PC;
+
 	if (*RESB == 0x00)
 	{
 		reset_low = true;
@@ -100,6 +102,8 @@ void W65C816S::Clock()
 				PC is loaded with the contents of 00FFFC,D */
 
 			PC = emulation.RESET;
+			address_out = PC;
+
 			instruction_cycles = 0;
 
 			reset_low = false;
@@ -110,37 +114,35 @@ void W65C816S::Clock()
 			*VPA = 0b1;
 			*RWB = 0b1;
 
-			address_out = PC;
-
 			return;
 		}
 	}
 
 	if (instruction_cycles == 0)
 	{
-		std::cout << "Fetched : " << std::hex << std::setw(2) << std::setfill('0') << unsigned(data_in) << std::endl;
+		std::cout << "Fetched : " << std::hex << std::setw(2) << std::setfill('0') << unsigned(data_in) << " : ";
 
 		IR = data_in;
 
+		std::cout << opcodes[IR].mnemonic << " (" << addressing_modes[(int)opcodes[IR].addressing_mode].description << ")" << std::endl;
+
 		++PC.db0_15;
+		address_out = PC;
+
 		++instruction_cycles;
 
 		return;
 	}
 	else
 	{
+		std::cout << "Executing : " << std::hex << std::setw(2) << std::setfill('0') << unsigned(IR) << " : " << std::dec << unsigned(instruction_cycles) << " : ";
+		std::cout << opcodes[IR].mnemonic << " (" << addressing_modes[(int)opcodes[IR].addressing_mode].description << ")" << std::endl;
 
-	}
+		if (opcodes[IR].function != nullptr)
+			(this->*(opcodes[IR].function))((void*)&opcodes[IR]);
+		else
+			std::cout << "function not defined" << std::endl;
 
-	if (instruction_cycles == 0)
-	{
-		*VPB = 0b1;
-		*MLB = 0b1;
-		*VDA = 0b1;
-		*VPA = 0b1;
-		*RWB = 0b1;
-
-		address_out = PC;
 	}
 }
 
@@ -148,10 +150,10 @@ void W65C816S::Run()
 {
 	while (running) // continue to keep running while running is true
 	{
-		// Put PC onto the address bus and increase it by 1
+		// Put the required address valus onto the address bus and data bus
 
-		*A0_A15 = PC.db0_15;	// put 16 bit program counter onto address bus
-		*D0_D7 = PC.b16_23;		// put 8 bit program bank register onto data bus
+		*A0_A15 = address_out.db0_15;	// put lower 16 bits of address onto address bus
+		*D0_D7 = address_out.b16_23;		// put highest 8 bits of address onto data bus
 
 		// wait while PHI2 is high
 
@@ -187,12 +189,38 @@ void W65C816S::Start()
 	{
 		running = true;
 
-		std::thread thread_start(&W65C816S::Run, this);
-		thread_start.detach();
+		thread_run = std::thread(&W65C816S::Run, this);
+		thread_run.detach();
 	}
 }
 
 void W65C816S::Stop()
 {
 	running = false;
+	
+	if (thread_run.joinable())
+		thread_run.join();
 }
+
+void W65C816S::Debug()
+{
+	using namespace std;
+
+	ostringstream stringStream;
+	int col = 0;
+
+	stringStream << setfill('0');
+
+	stringStream << "A : " << hex << setw(4) << A.db0_15 << " " << dec << A.db0_15 << std::endl;
+	stringStream << "X : " << hex << setw(4) << X.db0_15 << " " << dec << X.db0_15 << std::endl;
+	stringStream << "Y : " << hex << setw(4) << Y.db0_15 << " " << dec << Y.db0_15 << std::endl;
+
+	system->DrawString(9, 9 + (9 * 8), stringStream.str(), olc::BLACK, 1);
+	system->DrawString(7, 7 + (9 * 8), stringStream.str(), olc::BLACK, 1);
+	system->DrawString(9, 7 + (9 * 8), stringStream.str(), olc::BLACK, 1);
+	system->DrawString(7, 9 + (9 * 8), stringStream.str(), olc::BLACK, 1);
+	system->DrawString(7, 8 + (9 * 8), stringStream.str(), olc::BLACK, 1);
+	system->DrawString(9, 8 + (9 * 8), stringStream.str(), olc::BLACK, 1);
+	system->DrawString(8, 8 + (9 * 8), stringStream.str(), olc::WHITE, 1);
+}
+

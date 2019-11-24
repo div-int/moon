@@ -95,47 +95,314 @@ public:
 		ADDRESSINGMODES addressing_mode;
 		uint8_t cycles;
 		uint8_t bytes;
+		void(W65C816S::*function)(void* opcode);
 	} OPCODE;
 
 	OPCODE opcodes[256] = {
 
 		// 0x00 - 0x0f
 
-		{"BRK", ADDRESSINGMODES::stack, 7, 2},
-		{"ORA", ADDRESSINGMODES::direct_indexed_indirect, 6, 2},
-		{"COP", ADDRESSINGMODES::stack, 7, 2},
-		{"ORA", ADDRESSINGMODES::stack_relative, 4, 2},
-		{"TSB", ADDRESSINGMODES::direct, 5, 2},
-		{"ORA", ADDRESSINGMODES::direct, 3, 2},
-		{"ASL", ADDRESSINGMODES::direct, 5, 2},
-		{"ORA", ADDRESSINGMODES::direct_indirect_long, 6, 2},
-		{"PHP", ADDRESSINGMODES::stack, 3, 1},
-		{"ORA", ADDRESSINGMODES::immediate, 2, 2},
-		{"ASL", ADDRESSINGMODES::accumulator, 2, 1},
-		{"PHD", ADDRESSINGMODES::stack, 4, 1},
-		{"TSB", ADDRESSINGMODES::absolute, 6, 3},
-		{"ORA", ADDRESSINGMODES::absolute, 4, 3},
-		{"ASL", ADDRESSINGMODES::absolute, 6, 3},
-		{"ORA", ADDRESSINGMODES::absolute_long, 5, 4},
+		{"BRK", ADDRESSINGMODES::stack, 7, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indexed_indirect, 6, 2, nullptr},
+		{"COP", ADDRESSINGMODES::stack, 7, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::stack_relative, 4, 2, nullptr},
+		{"TSB", ADDRESSINGMODES::direct, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct, 3, 2, nullptr},
+		{"ASL", ADDRESSINGMODES::direct, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_long, 6, 2, nullptr},
+		{"PHP", ADDRESSINGMODES::stack, 3, 1, nullptr},
+		{"ORA", ADDRESSINGMODES::immediate, 2, 2, nullptr},
+		{"ASL", ADDRESSINGMODES::accumulator, 2, 1, nullptr},
+		{"PHD", ADDRESSINGMODES::stack, 4, 1, nullptr},
+		{"TSB", ADDRESSINGMODES::absolute, 6, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute, 4, 3, nullptr},
+		{"ASL", ADDRESSINGMODES::absolute, 6, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_long, 5, 4, nullptr},
 
 		// 0x10 - 0x1f
 
-		{"BPL", ADDRESSINGMODES::program_counter_relative, 2, 2},
-		{"ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2},
-		{"ORA", ADDRESSINGMODES::direct_indirect, 5, 2},
-		{"ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2},
-		{"TRB", ADDRESSINGMODES::direct, 5, 2},
-		{"ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2},
-		{"ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2},
-		{"ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2},
-		{"CLC", ADDRESSINGMODES::implied, 2, 1},
-		{"ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3},
-		{"INC", ADDRESSINGMODES::accumulator, 2, 1},
-		{"TCS", ADDRESSINGMODES::implied, 2, 1},
-		{"TRB", ADDRESSINGMODES::absolute, 6, 3},
-		{"ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3},
-		{"ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3},
-		{"ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4},
+		{"BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr},
+		{"TRB", ADDRESSINGMODES::direct, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr},
+		{"ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr},
+		{"CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr},
+		{"INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr},
+		{"TCS", ADDRESSINGMODES::implied, 2, 1, nullptr},
+		{"TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr},
+		{"ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr},
+
+		// 0x20 - 0x2f
+
+		{"BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr},
+		{"TRB", ADDRESSINGMODES::direct, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr},
+		{"ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr},
+		{"CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr},
+		{"INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr},
+		{"TCS", ADDRESSINGMODES::implied, 2, 1, nullptr},
+		{"TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr},
+		{"ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr},
+
+		// 0x30 - 0x3f
+
+		{"BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr},
+		{"TRB", ADDRESSINGMODES::direct, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr},
+		{"ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr},
+		{"SEC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::SEC },
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr},
+		{"INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr},
+		{"TCS", ADDRESSINGMODES::implied, 2, 1, nullptr},
+		{"TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr},
+		{"ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr},
+
+		// 0x40 - 0x4f
+
+		{"BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr},
+		{"TRB", ADDRESSINGMODES::direct, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr},
+		{"ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr},
+		{"CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr},
+		{"INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr},
+		{"TCS", ADDRESSINGMODES::implied, 2, 1, nullptr},
+		{"TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr},
+		{"ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr},
+
+		// 0x50 - 0x5f
+
+		{"BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr},
+		{"TRB", ADDRESSINGMODES::direct, 5, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr},
+		{"ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr},
+		{"ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr},
+		{"CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr},
+		{"INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr},
+		{"TCS", ADDRESSINGMODES::implied, 2, 1, nullptr},
+		{"TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr},
+		{"ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr},
+
+		// 0x60 - 0x6f
+
+		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
+		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
+		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
+		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "ADC", ADDRESSINGMODES::immediate, 2, 2, &W65C816S::ADC },
+		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
+		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
+
+		// 0x70 - 0x7f
+
+		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
+		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
+		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
+		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
+		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
+		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
+
+		// 0x80 - 0x8f
+
+		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
+		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
+		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
+		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
+		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
+		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
+
+		// 0x90 - 0x9f
+
+		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
+		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
+		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
+		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
+		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
+		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
+
+		// 0xa0 - 0xaf
+
+		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
+		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
+		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
+		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
+		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
+		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
+
+		// 0xb0 - 0xbf
+
+		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
+		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
+		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
+		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
+		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
+		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
+
+		// 0xc0 - 0xcf
+
+		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
+		{ "REP", ADDRESSINGMODES::immediate, 3, 2, &W65C816S::REP },
+		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
+		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
+		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
+		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
+		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
+		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
+
+		// 0xd0 - 0xdf
+
+		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
+		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
+		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
+		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
+		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
+		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
+
+		// 0xe0 - 0xef
+
+		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
+		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
+		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
+		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
+		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
+		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
+
+		// 0xf0 - 0xff
+
+		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
+		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
+		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
+		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
+		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
+		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "XCE", ADDRESSINGMODES::implied, 2, 1, &W65C816S::XCE },
+		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
+		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
 	};
 
 	typedef std::shared_ptr<W65C816S> SharedPtr;
@@ -187,6 +454,8 @@ private:
 	Register8 data_in;
 	Register8 data_out;
 
+	Register16 immediate_data;
+
 	Register8 IR;		// Instruction register
 	Register8 P;		// Processor status register
 	Register8 EP;		// Extended bits of status register
@@ -221,11 +490,12 @@ private:
 	Bus::Line1Bit VPB;
 
 	uint8_t instruction_cycles;
-	uint16_t fetched;
+
 	uint32_t reset_low_cycles;
 	bool reset_low;
 
 	uint64_t clock_count;
+	std::thread thread_run;
 
 protected:
 
@@ -285,73 +555,139 @@ public:
 	void Start();
 	void Stop();
 
+	// Debug functions
+
+	void W65C816S::Debug();
+
 	// Opcode functions
 
-	inline void CLC()
+	inline void ADC(void *opcode)
 	{
+		switch (((OPCODE*)opcode)->addressing_mode)
+		{
+		case ADDRESSINGMODES::immediate:
+				switch (instruction_cycles)
+				{
+				case 1:
+					if (GetM()) // 8 bit
+					{
+						Register8 PA = A.b0_7;
+
+						A.b0_7 += data_in;
+
+						if (A.b0_7 == 0x00) SetZ();
+						if (A.b0_7 < PA) SetC();
+
+						instruction_cycles = 0;
+					}
+					else // 16 bit
+					{
+						immediate_data.db0_15 = data_in;
+						++instruction_cycles;
+					}
+					break;
+				case 2:
+					Register16 PA = A;
+
+					immediate_data.b8_15 = data_in;
+
+					A.db0_15 += immediate_data.db0_15;
+
+					if (A.db0_15 == 0x0000) SetZ();
+					if (A.db0_15 < PA.db0_15) SetC();
+
+					instruction_cycles = 0;
+					break;
+				}
+				break;
+		}
+
 		++PC.db0_15;
 		address_out = PC;
+	}
 
+	inline void REP(void* opcode)
+	{
+		switch (((OPCODE*)opcode)->addressing_mode)
+		{
+		case ADDRESSINGMODES::immediate:
+			switch (instruction_cycles)
+			{
+			case 1:
+				P &= ~(data_in);
+				instruction_cycles = 0;
+				break;
+			}
+		}
+
+		++PC.db0_15;
+		address_out = PC;
+	}
+
+	inline void SEP(void* opcode)
+	{
+		switch (((OPCODE*)opcode)->addressing_mode)
+		{
+		case ADDRESSINGMODES::immediate:
+			switch (instruction_cycles)
+			{
+			case 1:
+				P |= data_in;
+				++PC.db0_15;
+				address_out = PC;
+				instruction_cycles = 0;
+				break;
+			}
+		}
+
+		++PC.db0_15;
+		address_out = PC;
+	}
+
+	inline void CLC(void* opcode)
+	{
 		ClearC();
 		
 		instruction_cycles = 0;
 	}
 
-	inline void CLD()
+	inline void CLD(void* opcode)
 	{
-		++PC.db0_15;
-		address_out = PC;
-
 		ClearD();
 		
 		instruction_cycles = 0;
 	}
 
-	inline void CLI()
+	inline void CLI(void* opcode)
 	{
-		++PC.db0_15;
-		address_out = PC;
-
 		ClearI();
 		
 		instruction_cycles = 0;
 	}
 
-	inline void SEC()
+	inline void SEC(void* opcode)
 	{
-		++PC.db0_15;
-		address_out = PC;
-
 		SetC();
 		
 		instruction_cycles = 0;
 	}
 
-	inline void SED()
+	inline void SED(void* opcode)
 	{
-		++PC.db0_15;
-		address_out = PC;
-
 		SetD();
 		
 		instruction_cycles = 0;
 	}
 
-	inline void SEI()
+	inline void SEI(void* opcode)
 	{
-		++PC.db0_15;
-		address_out = PC;
-
 		SetI();
 		
 		instruction_cycles = 0;
 	}
 
-	inline void XCE()
+	inline void XCE(void* opcode)
 	{
-		++PC.db0_15;
-		address_out = PC;
-
 		GetC() ? SetE() : ClearE();
 		
 		instruction_cycles = 0;
