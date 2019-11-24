@@ -102,41 +102,41 @@ public:
 
 		// 0x00 - 0x0f
 
-		{"BRK", ADDRESSINGMODES::stack, 7, 2, nullptr},
-		{"ORA", ADDRESSINGMODES::direct_indexed_indirect, 6, 2, nullptr},
-		{"COP", ADDRESSINGMODES::stack, 7, 2, nullptr},
-		{"ORA", ADDRESSINGMODES::stack_relative, 4, 2, nullptr},
-		{"TSB", ADDRESSINGMODES::direct, 5, 2, nullptr},
-		{"ORA", ADDRESSINGMODES::direct, 3, 2, nullptr},
-		{"ASL", ADDRESSINGMODES::direct, 5, 2, nullptr},
-		{"ORA", ADDRESSINGMODES::direct_indirect_long, 6, 2, nullptr},
-		{"PHP", ADDRESSINGMODES::stack, 3, 1, nullptr},
-		{"ORA", ADDRESSINGMODES::immediate, 2, 2, nullptr},
-		{"ASL", ADDRESSINGMODES::accumulator, 2, 1, nullptr},
-		{"PHD", ADDRESSINGMODES::stack, 4, 1, nullptr},
-		{"TSB", ADDRESSINGMODES::absolute, 6, 3, nullptr},
-		{"ORA", ADDRESSINGMODES::absolute, 4, 3, nullptr},
-		{"ASL", ADDRESSINGMODES::absolute, 6, 3, nullptr},
-		{"ORA", ADDRESSINGMODES::absolute_long, 5, 4, nullptr},
+		{"BRK", ADDRESSINGMODES::stack, 7, 2, &W65C816S::BRK},
+		{"ORA", ADDRESSINGMODES::direct_indexed_indirect, 6, 2, &W65C816S::ORA},
+		{"COP", ADDRESSINGMODES::stack, 7, 2, &W65C816S::COP},
+		{"ORA", ADDRESSINGMODES::stack_relative, 4, 2, &W65C816S::ORA},
+		{"TSB", ADDRESSINGMODES::direct, 5, 2, &W65C816S::TSB},
+		{"ORA", ADDRESSINGMODES::direct, 3, 2, &W65C816S::ORA},
+		{"ASL", ADDRESSINGMODES::direct, 5, 2, &W65C816S::ASL},
+		{"ORA", ADDRESSINGMODES::direct_indirect_long, 6, 2, &W65C816S::ORA},
+		{"PHP", ADDRESSINGMODES::stack, 3, 1, &W65C816S::PHP},
+		{"ORA", ADDRESSINGMODES::immediate, 2, 2, &W65C816S::ORA},
+		{"ASL", ADDRESSINGMODES::accumulator, 2, 1, &W65C816S::ASL },
+		{"PHD", ADDRESSINGMODES::stack, 4, 1, &W65C816S::PHD},
+		{"TSB", ADDRESSINGMODES::absolute, 6, 3, &W65C816S::TSB},
+		{"ORA", ADDRESSINGMODES::absolute, 4, 3, &W65C816S::ORA},
+		{"ASL", ADDRESSINGMODES::absolute, 6, 3, &W65C816S::ASL},
+		{"ORA", ADDRESSINGMODES::absolute_long, 5, 4, &W65C816S::ORA},
 
 		// 0x10 - 0x1f
 
-		{"BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr},
-		{"ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr},
-		{"ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr},
-		{"ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr},
-		{"TRB", ADDRESSINGMODES::direct, 5, 2, nullptr},
-		{"ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr},
-		{"ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr},
-		{"ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr},
+		{"BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, &W65C816S::BPL},
+		{"ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, &W65C816S::ORA},
+		{"ORA", ADDRESSINGMODES::direct_indirect, 5, 2, &W65C816S::ORA},
+		{"ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, &W65C816S::ORA},
+		{"TRB", ADDRESSINGMODES::direct, 5, 2, &W65C816S::TRB},
+		{"ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, &W65C816S::ORA},
+		{"ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, &W65C816S::ASL},
+		{"ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, &W65C816S::ORA},
 		{"CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
-		{"ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr},
-		{"INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr},
-		{"TCS", ADDRESSINGMODES::implied, 2, 1, nullptr},
-		{"TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr},
-		{"ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr},
-		{"ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr},
-		{"ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr},
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, &W65C816S::ORA},
+		{"INC", ADDRESSINGMODES::accumulator, 2, 1, &W65C816S::INC},
+		{"TCS", ADDRESSINGMODES::implied, 2, 1, &W65C816S::TCS},
+		{"TRB", ADDRESSINGMODES::absolute, 6, 3, &W65C816S::TRB},
+		{"ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, &W65C816S::ORA},
+		{"ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, &W65C816S::ASL},
+		{"ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, &W65C816S::ORA},
 
 		// 0x20 - 0x2f
 
@@ -568,7 +568,26 @@ public:
 		case ADDRESSINGMODES::immediate:
 				switch (instruction_cycles)
 				{
+				case 0:
+					*VPB = 0b1;
+					*MLB = 0b1;
+					*VDA = 0b1;
+					*VPA = 0b1;
+
+					++PC.db0_15;
+					address_out = PC;
+					++instruction_cycles;
+
+					break;
 				case 1:
+					*VPB = 0b1;
+					*MLB = 0b1;
+					*VDA = 0b0;
+					*VPA = 0b1;
+
+					++PC.db0_15;
+					address_out = PC;
+
 					if (GetM()) // 8 bit
 					{
 						Register8 PA = A.b0_7;
@@ -587,6 +606,14 @@ public:
 					}
 					break;
 				case 2:
+					*VPB = 0b1;
+					*MLB = 0b1;
+					*VDA = 0b0;
+					*VPA = 0b1;
+
+					++PC.db0_15;
+					address_out = PC;
+
 					Register16 PA = A;
 
 					immediate_data.b8_15 = data_in;
@@ -601,10 +628,147 @@ public:
 				}
 				break;
 		}
-
-		++PC.db0_15;
-		address_out = PC;
 	}
+
+	inline void AND(void* opcode) {}
+	inline void ASL(void* opcode) {}
+	inline void BCC(void* opcode) {}
+	inline void BCS(void* opcode) {}
+	inline void BEQ(void* opcode) {}
+	inline void BIT(void* opcode) {}
+	inline void BMI(void* opcode) {}
+	inline void BNE(void* opcode) {}
+	inline void BPL(void* opcode) {}
+	inline void BRA(void* opcode) {}
+	inline void BRK(void* opcode) {}
+	inline void BRL(void* opcode) {}
+	inline void BVC(void* opcode) {}
+	inline void BVS(void* opcode) {}
+
+	inline void CLC(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			ClearC();
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	inline void CLD(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			ClearD();
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	inline void CLI(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			ClearI();
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	inline void CLV(void* opcode) {}
+	inline void CMP(void* opcode) {}
+	inline void COP(void* opcode) {}
+	inline void CPX(void* opcode) {}
+	inline void CPY(void* opcode) {}
+	inline void DEC(void* opcode) {}
+	inline void DEX(void* opcode) {}
+	inline void DEY(void* opcode) {}
+	inline void EOR(void* opcode) {}
+	inline void INC(void* opcode) {}
+	inline void INX(void* opcode) {}
+	inline void INY(void* opcode) {}
+	inline void JML(void* opcode) {}
+	inline void JMP(void* opcode) {}
+	inline void JSL(void* opcode) {}
+	inline void JSR(void* opcode) {}
+	inline void LDA(void* opcode) {}
+	inline void LDX(void* opcode) {}
+	inline void LDY(void* opcode) {}
+	inline void LSR(void* opcode) {}
+	inline void MVN(void* opcode) {}
+	inline void MVP(void* opcode) {}
+	inline void NOP(void* opcode) {}
+	inline void ORA(void* opcode) {}
+	inline void PEA(void* opcode) {}
+	inline void PEI(void* opcode) {}
+	inline void PER(void* opcode) {}
+	inline void PHA(void* opcode) {}
+	inline void PHB(void* opcode) {}
+	inline void PHD(void* opcode) {}
+	inline void PHK(void* opcode) {}
+	inline void PHP(void* opcode) {}
+	inline void PHX(void* opcode) {}
+	inline void PHY(void* opcode) {}
+	inline void PLA(void* opcode) {}
+	inline void PLB(void* opcode) {}
+	inline void PLD(void* opcode) {}
+	inline void PLX(void* opcode) {}
+	inline void PLY(void* opcode) {}
+
 
 	inline void REP(void* opcode)
 	{
@@ -613,16 +777,39 @@ public:
 		case ADDRESSINGMODES::immediate:
 			switch (instruction_cycles)
 			{
+			case 0:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b1;
+				*VPA = 0b1;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
 			case 1:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				++PC.db0_15;
+				address_out = PC;
+
 				P &= ~(data_in);
 				instruction_cycles = 0;
 				break;
 			}
 		}
-
-		++PC.db0_15;
-		address_out = PC;
 	}
+
+	inline void ROL(void* opcode) {}
+	inline void ROR(void* opcode) {}
+	inline void RTI(void* opcode) {}
+	inline void RTL(void* opcode) {}
+	inline void RTS(void* opcode) {}
+	inline void SBC(void* opcode) {}
 
 	inline void SEP(void* opcode)
 	{
@@ -631,65 +818,165 @@ public:
 		case ADDRESSINGMODES::immediate:
 			switch (instruction_cycles)
 			{
-			case 1:
-				P |= data_in;
+			case 0:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b1;
+				*VPA = 0b1;
+
 				++PC.db0_15;
 				address_out = PC;
+				++instruction_cycles;
+
+				break;
+			case 1:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				++PC.db0_15;
+				address_out = PC;
+
+				P |= data_in;
 				instruction_cycles = 0;
 				break;
 			}
 		}
-
-		++PC.db0_15;
-		address_out = PC;
-	}
-
-	inline void CLC(void* opcode)
-	{
-		ClearC();
-		
-		instruction_cycles = 0;
-	}
-
-	inline void CLD(void* opcode)
-	{
-		ClearD();
-		
-		instruction_cycles = 0;
-	}
-
-	inline void CLI(void* opcode)
-	{
-		ClearI();
-		
-		instruction_cycles = 0;
 	}
 
 	inline void SEC(void* opcode)
 	{
-		SetC();
-		
-		instruction_cycles = 0;
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			SetC();
+
+			instruction_cycles = 0;
+			break;
+		}
 	}
 
 	inline void SED(void* opcode)
 	{
-		SetD();
-		
-		instruction_cycles = 0;
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			SetD();
+
+			instruction_cycles = 0;
+			break;
+		}
 	}
 
 	inline void SEI(void* opcode)
 	{
-		SetI();
-		
-		instruction_cycles = 0;
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			SetI();
+
+			instruction_cycles = 0;
+			break;
+		}
 	}
+
+	inline void STA(void* opcode) {}
+	inline void STP(void* opcode) {}
+	inline void STX(void* opcode) {}
+	inline void STY(void* opcode) {}
+	inline void STZ(void* opcode) {}
+	inline void TAX(void* opcode) {}
+	inline void TAY(void* opcode) {}
+	inline void TCD(void* opcode) {}
+	inline void TCS(void* opcode) {}
+	inline void TDC(void* opcode) {}
+	inline void TRB(void* opcode) {}
+	inline void TSB(void* opcode) {}
+	inline void TSC(void* opcode) {}
+	inline void TSX(void* opcode) {}
+	inline void TXA(void* opcode) {}
+	inline void TXS(void* opcode) {}
+	inline void TXY(void* opcode) {}
+	inline void TYA(void* opcode) {}
+	inline void TYX(void* opcode) {}
+	inline void WAI(void* opcode) {}
+	inline void WDM(void* opcode) {}
+	inline void XBA(void* opcode) {}
 
 	inline void XCE(void* opcode)
 	{
-		GetC() ? SetE() : ClearE();
-		
-		instruction_cycles = 0;
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			GetC() ? SetE() : ClearE();
+
+			instruction_cycles = 0;
+			break;
+		}
 	}
 };

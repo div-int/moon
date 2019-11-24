@@ -77,6 +77,8 @@ private:
 	uint8_t* screen_buffer_2;
 	uint8_t* screen_buffer_3;
 
+	uint16_t palette_buffer_0[256];
+
 	uint8_t screen_buffer_enabled;
 
 	uint8_t* sprite_buffer;

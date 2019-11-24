@@ -42,10 +42,10 @@ bool Moon::OnUserCreate()
 
 	for (uint32_t i = 0; i < (1024 * 1024); i++)
 	{
-		screen_buffer_0[i] = (((i / (32 * 1024)) + (i / 32)) % 2) * rand();
-		screen_buffer_1[i] = (((i / (16 * 1024)) + (i / 16)) % 2) * rand();
-		screen_buffer_2[i] = (((i / (8 * 1024)) + (i / 8)) % 2) * rand();
-		screen_buffer_3[i] = (((i / (4 * 1024)) + (i / 4)) % 2) * rand();
+		screen_buffer_0[i] = (((i / (32 * 1024)) + (i / 32)) % 2) * ((i / 4) % 256);
+		screen_buffer_1[i] = (((i / (16 * 1024)) + (i / 16)) % 2) * ((i / 2) % 256);
+		screen_buffer_2[i] = (((i / (8 * 1024)) + (i / 8)) % 2) * ((i / 1) % 256);
+		screen_buffer_3[i] = ((i / 1024) % 256);
 	}
 
 	pixel_x_start_0 = 0;
@@ -67,6 +67,16 @@ bool Moon::OnUserCreate()
 	pixel_y_scale_3 = 0x10000;
 
 	screen_buffer_enabled = 0b1111;
+
+	for (int i = 0; i < 256; i++)
+	{
+		auto r = ((i / 64) * 4) % 16;
+		auto g = ((i / 32) * 4) % 16;
+		auto b = ((i / 16) * 4) % 16;
+		auto l = (i % 16);
+
+		palette_buffer_0[i] = (r << 12) | (g << 8) | (b << 4) | l;
+	}
 
 	return true;
 }
@@ -109,7 +119,7 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 	pixel_x_3 = pixel_x_start_3 & 0x3ffffff;
 	pixel_y_3 = pixel_y_start_3 & 0x3ffffff;
 
-	//if (GetKey(olc::Key::SPACE).bReleased)
+	if (GetKey(olc::Key::SPACE).bReleased)
 		*PHI2 = ~(*PHI2);
 
 	if (GetKey(olc::Key::Q).bReleased)
@@ -184,9 +194,9 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 
 		if (pixel_lookup != 0x00)
 		{
-			pixel_colour.r = pixel_lookup;
-			pixel_colour.g = 0x00;
-			pixel_colour.b = 0x00;
+			pixel_colour.r = ((palette_buffer_0[pixel_lookup] & 0xf000) >> 8) + (palette_buffer_0[pixel_lookup] & 0x000f);
+			pixel_colour.g = ((palette_buffer_0[pixel_lookup] & 0x0f00) >> 4) + (palette_buffer_0[pixel_lookup] & 0x000f);
+			pixel_colour.b = (palette_buffer_0[pixel_lookup] & 0x00f0) + (palette_buffer_0[pixel_lookup] & 0x000f);
 		}
 		else
 		{
@@ -202,9 +212,9 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 
 			if (pixel_lookup != 0x00)
 			{
-				pixel_colour.r = 0x00;
-				pixel_colour.g = pixel_lookup;
-				pixel_colour.b = 0x00;
+				pixel_colour.r = ((palette_buffer_0[pixel_lookup] & 0xf000) >> 8) + (palette_buffer_0[pixel_lookup] & 0x000f);
+				pixel_colour.g = ((palette_buffer_0[pixel_lookup] & 0x0f00) >> 4) + (palette_buffer_0[pixel_lookup] & 0x000f);
+				pixel_colour.b = (palette_buffer_0[pixel_lookup] & 0x00f0) + (palette_buffer_0[pixel_lookup] & 0x000f);
 			}
 			else
 			{
@@ -220,9 +230,9 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 
 				if (pixel_lookup != 0x00)
 				{
-					pixel_colour.r = 0x00;
-					pixel_colour.g = 0x00;
-					pixel_colour.b = pixel_lookup;
+					pixel_colour.r = ((palette_buffer_0[pixel_lookup] & 0xf000) >> 8) + (palette_buffer_0[pixel_lookup] & 0x000f);
+					pixel_colour.g = ((palette_buffer_0[pixel_lookup] & 0x0f00) >> 4) + (palette_buffer_0[pixel_lookup] & 0x000f);
+					pixel_colour.b = (palette_buffer_0[pixel_lookup] & 0x00f0) + (palette_buffer_0[pixel_lookup] & 0x000f);
 				}
 				else
 				{
@@ -238,9 +248,9 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 
 					if (pixel_lookup != 0x00)
 					{
-						pixel_colour.r = pixel_lookup;
-						pixel_colour.g = pixel_lookup;
-						pixel_colour.b = pixel_lookup;
+						pixel_colour.r = ((palette_buffer_0[pixel_lookup] & 0xf000) >> 8) + (palette_buffer_0[pixel_lookup] & 0x000f);
+						pixel_colour.g = ((palette_buffer_0[pixel_lookup] & 0x0f00) >> 4) + (palette_buffer_0[pixel_lookup] & 0x000f);
+						pixel_colour.b = (palette_buffer_0[pixel_lookup] & 0x00f0) + (palette_buffer_0[pixel_lookup] & 0x000f);
 					}
 				}
 			}
@@ -305,7 +315,7 @@ int main()
 {
 	Moon moon;
 
-	if (moon.Construct(848, 480, 1, 1, false, false))
+	if (moon.Construct(848, 480, 2, 2, false, true))
 		moon.Start();
 
 	return OK;

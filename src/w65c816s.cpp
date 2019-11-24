@@ -76,6 +76,10 @@ void W65C816S::Reset()
 		*VDA = 0x0;
 		*VPB = 0x1;
 		*VPA = 0x0;
+
+		A.db0_15 = 0x0000;
+		X.db0_15 = 0x0000;
+		Y.db0_15 = 0x0000;
 	}
 }
 
@@ -126,10 +130,10 @@ void W65C816S::Clock()
 
 		std::cout << opcodes[IR].mnemonic << " (" << addressing_modes[(int)opcodes[IR].addressing_mode].description << ")" << std::endl;
 
-		++PC.db0_15;
-		address_out = PC;
-
-		++instruction_cycles;
+		if (opcodes[IR].function != nullptr)
+			(this->*(opcodes[IR].function))((void*)&opcodes[IR]);
+		else
+			std::cout << "function not defined" << std::endl;
 
 		return;
 	}
