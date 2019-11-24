@@ -16,13 +16,12 @@ Moon::Moon()
 
 Moon::~Moon()
 {
-	// TO DO
 }
 
 bool Moon::OnUserCreate()
 {
-	cpu->Start();
 	bus->Start();
+	cpu->Start();
 
 	pixel_x = 0;
 	pixel_y = 0;
