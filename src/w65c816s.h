@@ -262,7 +262,7 @@ public:
 		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
 		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
 		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
-		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "DEY", ADDRESSINGMODES::implied, 2, 1, &W65C816S::DEY },
 		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
 		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
 		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
@@ -338,9 +338,9 @@ public:
 		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
 		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
 		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
-		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "INY", ADDRESSINGMODES::implied, 2, 1, &W65C816S::INY },
 		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
-		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
+		{ "DEX", ADDRESSINGMODES::implied, 2, 1, &W65C816S::DEX },
 		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
 		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
 		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
@@ -376,7 +376,7 @@ public:
 		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
 		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
 		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
-		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
+		{ "INX", ADDRESSINGMODES::implied, 2, 1, &W65C816S::INX },
 		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
 		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
 		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
@@ -735,12 +735,231 @@ public:
 	inline void CPX(void* opcode) {}
 	inline void CPY(void* opcode) {}
 	inline void DEC(void* opcode) {}
-	inline void DEX(void* opcode) {}
-	inline void DEY(void* opcode) {}
+
+	inline void DEX(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			if (GetX())
+			{
+				--X.b0_7;
+
+				if (X.b0_7 == 0x00)
+					SetZ();
+				else
+					ClearZ();
+
+				if (X.b0_7 & 0x80)
+					SetN();
+				else
+					ClearN();
+			}
+			else
+			{
+				--X.db0_15;
+
+				if (X.db0_15 == 0x0000)
+					SetZ();
+				else
+					ClearZ();
+
+				if (X.db0_15 & 0x8000)
+					SetN();
+				else
+					ClearN();
+			}
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	inline void DEY(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			if (GetX())
+			{
+				--Y.b0_7;
+
+				if (Y.b0_7 == 0x00)
+					SetZ();
+				else
+					ClearZ();
+
+				if (Y.b0_7 & 0x80)
+					SetN();
+				else
+					ClearN();
+			}
+			else
+			{
+				--Y.db0_15;
+
+				if (X.db0_15 == 0x0000)
+					SetZ();
+				else
+					ClearZ();
+
+				if (Y.db0_15 & 0x8000)
+					SetN();
+				else
+					ClearN();
+			}
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+
 	inline void EOR(void* opcode) {}
 	inline void INC(void* opcode) {}
-	inline void INX(void* opcode) {}
-	inline void INY(void* opcode) {}
+
+	inline void INX(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			if (GetX())
+			{
+				++X.b0_7;
+
+				if (X.b0_7 == 0x00)
+					SetZ();
+				else
+					ClearZ();
+
+				if (X.b0_7 & 0x80)
+					SetN();
+				else
+					ClearN();
+			}
+			else
+			{
+				++X.db0_15;
+
+				if (X.db0_15 == 0x0000)
+					SetZ();
+				else
+					ClearZ();
+
+				if (X.db0_15 & 0x8000)
+					SetN();
+				else
+					ClearN();
+			}
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	inline void INY(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			if (GetX())
+			{
+				++Y.b0_7;
+
+				if (Y.b0_7 == 0x00)
+					SetZ();
+				else
+					ClearZ();
+
+				if (Y.b0_7 & 0x80)
+					SetN();
+				else
+					ClearN();
+			}
+			else
+			{
+				++Y.db0_15;
+
+				if (Y.db0_15 == 0x0000)
+					SetZ();
+				else
+					ClearZ();
+
+				if (Y.db0_15 & 0x8000)
+					SetN();
+				else
+					ClearN();
+			}
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
 	inline void JML(void* opcode) {}
 	inline void JMP(void* opcode) {}
 	inline void JSL(void* opcode) {}

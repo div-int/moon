@@ -42,7 +42,7 @@ bool Moon::OnUserCreate()
 
 	for (uint32_t i = 0; i < (1024 * 1024); i++)
 	{
-		screen_buffer_0[i] = (((i / (32 * 1024)) + (i / 32)) % 2) * ((i / 4) % 256);
+		screen_buffer_0[i] = (((i / (32 * 1024)) + (i / 32)) % 2) * ((i + (i / 1024)) % 256);
 		screen_buffer_1[i] = (((i / (16 * 1024)) + (i / 16)) % 2) * ((i / 2) % 256);
 		screen_buffer_2[i] = (((i / (8 * 1024)) + (i / 8)) % 2) * ((i / 1) % 256);
 		screen_buffer_3[i] = ((i / 1024) % 256);
@@ -70,10 +70,10 @@ bool Moon::OnUserCreate()
 
 	for (int i = 0; i < 256; i++)
 	{
-		auto r = ((i / 64) * 4) % 16;
-		auto g = ((i / 32) * 4) % 16;
-		auto b = ((i / 16) * 4) % 16;
-		auto l = (i % 16);
+		auto r = 0;// ((i / 64) * 4) % 16;
+		auto g = 0;// ((i / 32) * 4) % 16;
+		auto b = 0x0f;// ((i / 16) * 4) % 16;
+		auto l = i % 16;
 
 		palette_buffer_0[i] = (r << 12) | (g << 8) | (b << 4) | l;
 	}
@@ -119,7 +119,7 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 	pixel_x_3 = pixel_x_start_3 & 0x3ffffff;
 	pixel_y_3 = pixel_y_start_3 & 0x3ffffff;
 
-	if (GetKey(olc::Key::SPACE).bReleased)
+	//if (GetKey(olc::Key::SPACE).bReleased)
 		*PHI2 = ~(*PHI2);
 
 	if (GetKey(olc::Key::Q).bReleased)
@@ -315,7 +315,7 @@ int main()
 {
 	Moon moon;
 
-	if (moon.Construct(848, 480, 2, 2, false, true))
+	if (moon.Construct(848, 480, 2, 2, false, false))
 		moon.Start();
 
 	return OK;
