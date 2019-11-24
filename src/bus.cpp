@@ -88,7 +88,7 @@ uint32_t Bus::Read(uint32_t address)
 			return busDevice->Read(address);
 	}
 
-	/*if (address == 0x0000fffc)
+	if (address == 0x0000fffc)
 		return 0x38;
 	if (address == 0x0000fffd)
 		return 0x18;
@@ -103,7 +103,9 @@ uint32_t Bus::Read(uint32_t address)
 	if (address == 0x00000002)
 		return 0x34;
 	if (address == 0x00000003)
-		return 0x12;*/
+		return 0x12;
+	if (address == 0x00000004)
+		return 0xdb;
 
 	return 0xc8;
 }

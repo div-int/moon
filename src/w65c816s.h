@@ -95,7 +95,7 @@ public:
 		ADDRESSINGMODES addressing_mode;
 		uint8_t cycles;
 		uint8_t bytes;
-		void(W65C816S::*function)(void* opcode);
+		void(W65C816S::* function)(void* opcode);
 	} OPCODE;
 
 	OPCODE opcodes[256] = {
@@ -360,7 +360,7 @@ public:
 		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
 		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
 		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
-		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
+		{ "STP", ADDRESSINGMODES::implied, 3, 1, &W65C816S::STP },
 		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
 		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
 		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
@@ -494,6 +494,8 @@ private:
 	uint32_t reset_low_cycles;
 	bool reset_low;
 
+	bool stp, wai;
+
 	uint64_t clock_count;
 	std::thread thread_run;
 
@@ -561,72 +563,72 @@ public:
 
 	// Opcode functions
 
-	void ADC(void *opcode)
+	void ADC(void* opcode)
 	{
 		switch (((OPCODE*)opcode)->addressing_mode)
 		{
 		case ADDRESSINGMODES::immediate:
-				switch (instruction_cycles)
+			switch (instruction_cycles)
+			{
+			case 0:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b1;
+				*VPA = 0b1;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+			case 1:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				++PC.db0_15;
+				address_out = PC;
+
+				if (GetM()) // 8 bit
 				{
-				case 0:
-					*VPB = 0b1;
-					*MLB = 0b1;
-					*VDA = 0b1;
-					*VPA = 0b1;
+					Register8 PA = A.b0_7;
 
-					++PC.db0_15;
-					address_out = PC;
-					++instruction_cycles;
+					A.b0_7 += data_in;
 
-					break;
-				case 1:
-					*VPB = 0b1;
-					*MLB = 0b1;
-					*VDA = 0b0;
-					*VPA = 0b1;
-
-					++PC.db0_15;
-					address_out = PC;
-
-					if (GetM()) // 8 bit
-					{
-						Register8 PA = A.b0_7;
-
-						A.b0_7 += data_in;
-
-						if (A.b0_7 == 0x00) SetZ();
-						if (A.b0_7 < PA) SetC();
-
-						instruction_cycles = 0;
-					}
-					else // 16 bit
-					{
-						immediate_data.db0_15 = data_in;
-						++instruction_cycles;
-					}
-					break;
-				case 2:
-					*VPB = 0b1;
-					*MLB = 0b1;
-					*VDA = 0b0;
-					*VPA = 0b1;
-
-					++PC.db0_15;
-					address_out = PC;
-
-					Register16 PA = A;
-
-					immediate_data.b8_15 = data_in;
-
-					A.db0_15 += immediate_data.db0_15;
-
-					if (A.db0_15 == 0x0000) SetZ();
-					if (A.db0_15 < PA.db0_15) SetC();
+					if (A.b0_7 == 0x00) SetZ();
+					if (A.b0_7 < PA) SetC();
 
 					instruction_cycles = 0;
-					break;
+				}
+				else // 16 bit
+				{
+					immediate_data.db0_15 = data_in;
+					++instruction_cycles;
 				}
 				break;
+			case 2:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				++PC.db0_15;
+				address_out = PC;
+
+				Register16 PA = A;
+
+				immediate_data.b8_15 = data_in;
+
+				A.db0_15 += immediate_data.db0_15;
+
+				if (A.db0_15 == 0x0000) SetZ();
+				if (A.db0_15 < PA.db0_15) SetC();
+
+				instruction_cycles = 0;
+				break;
+			}
+			break;
 		}
 	}
 
@@ -970,7 +972,33 @@ public:
 	void LSR(void* opcode) {}
 	void MVN(void* opcode) {}
 	void MVP(void* opcode) {}
-	void NOP(void* opcode) {}
+
+	void NOP(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
 	void ORA(void* opcode) {}
 	void PEA(void* opcode) {}
 	void PEI(void* opcode) {}
@@ -1149,27 +1177,701 @@ public:
 	}
 
 	void STA(void* opcode) {}
-	void STP(void* opcode) {}
+
+	void STP(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*RDY = 0b1;
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*RDY = 0b1;
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			++instruction_cycles;
+
+			break;
+		case 2:
+			*RDY = 0b0;
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+			stp = true;
+
+			instruction_cycles = 0;
+
+			break;
+		}
+	}
+
 	void STX(void* opcode) {}
 	void STY(void* opcode) {}
 	void STZ(void* opcode) {}
-	void TAX(void* opcode) {}
-	void TAY(void* opcode) {}
-	void TCD(void* opcode) {}
-	void TCS(void* opcode) {}
-	void TDC(void* opcode) {}
+
+	void TAX(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			if (GetX())
+			{
+				X.b0_7 = A.b0_7;
+
+				if (X.b0_7 == 0x00)
+					SetZ();
+				else
+					ClearZ();
+
+				if (X.b0_7 & 0x80)
+					SetN();
+				else
+					ClearN();
+			}
+			else
+			{
+				X.db0_15 = A.db0_15;
+
+				if (X.db0_15 == 0x0000)
+					SetZ();
+				else
+					ClearZ();
+
+				if (X.db0_15 & 0x8000)
+					SetN();
+				else
+					ClearN();
+			}
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void TAY(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			if (GetX())
+			{
+				Y.b0_7 = A.b0_7;
+
+				if (Y.b0_7 == 0x00)
+					SetZ();
+				else
+					ClearZ();
+
+				if (Y.b0_7 & 0x80)
+					SetN();
+				else
+					ClearN();
+			}
+			else
+			{
+				Y.db0_15 = A.db0_15;
+
+				if (Y.db0_15 == 0x0000)
+					SetZ();
+				else
+					ClearZ();
+
+				if (Y.db0_15 & 0x8000)
+					SetN();
+				else
+					ClearN();
+			}
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void TCD(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			D.db0_15 = A.db0_15;
+
+			if (D.db0_15 == 0x0000)
+				SetZ();
+			else
+				ClearZ();
+
+			if (D.db0_15 & 0x8000)
+				SetN();
+			else
+				ClearN();
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void TCS(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			S.db0_15 = A.db0_15;
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void TDC(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			A.db0_15 = D.db0_15;
+
+			if (A.db0_15 == 0x0000)
+				SetZ();
+			else
+				ClearZ();
+
+			if (A.db0_15 & 0x8000)
+				SetN();
+			else
+				ClearN();
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
 	void TRB(void* opcode) {}
 	void TSB(void* opcode) {}
-	void TSC(void* opcode) {}
-	void TSX(void* opcode) {}
-	void TXA(void* opcode) {}
-	void TXS(void* opcode) {}
-	void TXY(void* opcode) {}
-	void TYA(void* opcode) {}
-	void TYX(void* opcode) {}
-	void WAI(void* opcode) {}
-	void WDM(void* opcode) {}
-	void XBA(void* opcode) {}
+
+	void TSC(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			A.db0_15 = S.db0_15;
+
+			if (A.db0_15 == 0x0000)
+				SetZ();
+			else
+				ClearZ();
+
+			if (A.db0_15 & 0x8000)
+				SetN();
+			else
+				ClearN();
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void TSX(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			X.db0_15 = S.db0_15;
+
+			if (X.db0_15 == 0x0000)
+				SetZ();
+			else
+				ClearZ();
+
+			if (X.db0_15 & 0x8000)
+				SetN();
+			else
+				ClearN();
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void TXA(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			if (GetM())
+			{
+				A.b0_7 = X.b0_7;
+
+				if (A.b0_7 == 0x00)
+					SetZ();
+				else
+					ClearZ();
+
+				if (A.b0_7 & 0x80)
+					SetN();
+				else
+					ClearN();
+			}
+			else
+			{
+				A.db0_15 = X.db0_15;
+
+				if (A.db0_15 == 0x0000)
+					SetZ();
+				else
+					ClearZ();
+
+				if (A.db0_15 & 0x8000)
+					SetN();
+				else
+					ClearN();
+			}
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void TXS(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			S.db0_15 = X.db0_15;
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void TXY(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			if (GetX())
+			{
+				Y.b0_7 = X.b0_7;
+
+				if (Y.b0_7 == 0x00)
+					SetZ();
+				else
+					ClearZ();
+
+				if (Y.b0_7 & 0x80)
+					SetN();
+				else
+					ClearN();
+			}
+			else
+			{
+				Y.db0_15 = X.db0_15;
+
+				if (Y.db0_15 == 0x0000)
+					SetZ();
+				else
+					ClearZ();
+
+				if (Y.db0_15 & 0x8000)
+					SetN();
+				else
+					ClearN();
+			}
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void TYA(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			if (GetM())
+			{
+				A.b0_7 = Y.b0_7;
+
+				if (A.b0_7 == 0x00)
+					SetZ();
+				else
+					ClearZ();
+
+				if (A.b0_7 & 0x80)
+					SetN();
+				else
+					ClearN();
+			}
+			else
+			{
+				A.db0_15 = Y.db0_15;
+
+				if (A.db0_15 == 0x0000)
+					SetZ();
+				else
+					ClearZ();
+
+				if (A.db0_15 & 0x8000)
+					SetN();
+				else
+					ClearN();
+			}
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void TYX(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			if (GetX())
+			{
+				X.b0_7 = Y.b0_7;
+
+				if (X.b0_7 == 0x00)
+					SetZ();
+				else
+					ClearZ();
+
+				if (X.b0_7 & 0x80)
+					SetN();
+				else
+					ClearN();
+			}
+			else
+			{
+				X.db0_15 = Y.db0_15;
+
+				if (X.db0_15 == 0x0000)
+					SetZ();
+				else
+					ClearZ();
+
+				if (X.db0_15 & 0x8000)
+					SetN();
+				else
+					ClearN();
+			}
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void WAI(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*RDY = 0b1;
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*RDY = 0b1;
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			++instruction_cycles;
+
+			break;
+		case 2:
+			*RDY = 0b0;
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+			wai = true;
+
+			instruction_cycles = 0;
+
+			break;
+		}
+	}
+
+	void WDM(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			++PC.db0_15;
+			address_out = PC;
+			instruction_cycles = 0;
+			break;
+		}
+	}
+
+	void XBA(void* opcode)
+	{
+		switch (instruction_cycles)
+		{
+		case 0:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b1;
+			*VPA = 0b1;
+
+			++PC.db0_15;
+			address_out = PC;
+			++instruction_cycles;
+
+			break;
+		case 1:
+			*VPB = 0b1;
+			*MLB = 0b1;
+			*VDA = 0b0;
+			*VPA = 0b0;
+
+			Register8 B;
+			
+			B = A.b8_15;
+			A.b8_15 = A.b0_7;
+			A.b0_7 = B;
+
+			if (A.b0_7 == 0x00)
+				SetZ();
+			else
+				ClearZ();
+
+			if (A.b0_7 & 0x80)
+				SetN();
+			else
+				ClearN();
+
+			instruction_cycles = 0;
+			break;
+		}
+	}
 
 	void XCE(void* opcode)
 	{

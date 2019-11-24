@@ -43,6 +43,8 @@ W65C816S::W65C816S(Bus::SharedPtr bus, olc::PixelGameEngine* system)
 	reset_low_cycles = 0;
 	reset_low = false;
 
+	wai = false;
+
 	clock_count = 0x0000000000000000;
 }
 
@@ -73,8 +75,9 @@ void W65C816S::Reset()
 		*E = 0x1;
 		*MX = 0x1;
 		*RWB = 0x1;
-		*VDA = 0x0;
 		*VPB = 0x1;
+		*MLB = 0x1;
+		*VDA = 0x0;
 		*VPA = 0x0;
 
 		A.db0_15 = 0x0000;
@@ -105,7 +108,9 @@ void W65C816S::Clock()
 				The Reset vector address is 00FFFC,D.(see Table 6-1 for Vectors)
 				PC is loaded with the contents of 00FFFC,D */
 
-			PC = emulation.RESET;
+			if (!stp)
+				PC = emulation.RESET;
+
 			address_out = PC;
 
 			instruction_cycles = 0;
@@ -118,9 +123,18 @@ void W65C816S::Clock()
 			*VPA = 0b1;
 			*RWB = 0b1;
 
+			stp = false;
+			wai = false;
+
 			return;
 		}
 	}
+
+	if (stp == true)
+		return;
+
+	if (wai == true)
+		return;
 
 	if (instruction_cycles == 0)
 	{
@@ -201,7 +215,7 @@ void W65C816S::Start()
 void W65C816S::Stop()
 {
 	running = false;
-	
+
 	if (thread_run.joinable())
 		thread_run.join();
 }
