@@ -26,7 +26,7 @@ bool Moon::OnUserCreate()
 	pixel_x = 0;
 	pixel_y = 0;
 
-	display_scale = 1;
+	display_scale = 2;
 	display_width = ScreenWidth() / display_scale;
 	display_height = ScreenHeight() / display_scale;
 	display_size = display_width * display_height;
@@ -109,7 +109,7 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 	pixel_x_3 = pixel_x_start_3 & 0x3ffffff;
 	pixel_y_3 = pixel_y_start_3 & 0x3ffffff;
 
-	if (GetKey(olc::Key::SPACE).bReleased)
+	//if (GetKey(olc::Key::SPACE).bReleased)
 		*PHI2 = ~(*PHI2);
 
 	if (GetKey(olc::Key::Q).bReleased)
@@ -305,7 +305,7 @@ int main()
 {
 	Moon moon;
 
-	if (moon.Construct(848, 480, 2, 2, true, true))
+	if (moon.Construct(848, 480, 1, 1, false, false))
 		moon.Start();
 
 	return OK;
