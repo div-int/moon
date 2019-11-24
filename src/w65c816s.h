@@ -561,7 +561,7 @@ public:
 
 	// Opcode functions
 
-	inline void ADC(void *opcode)
+	void ADC(void *opcode)
 	{
 		switch (((OPCODE*)opcode)->addressing_mode)
 		{
@@ -630,22 +630,22 @@ public:
 		}
 	}
 
-	inline void AND(void* opcode) {}
-	inline void ASL(void* opcode) {}
-	inline void BCC(void* opcode) {}
-	inline void BCS(void* opcode) {}
-	inline void BEQ(void* opcode) {}
-	inline void BIT(void* opcode) {}
-	inline void BMI(void* opcode) {}
-	inline void BNE(void* opcode) {}
-	inline void BPL(void* opcode) {}
-	inline void BRA(void* opcode) {}
-	inline void BRK(void* opcode) {}
-	inline void BRL(void* opcode) {}
-	inline void BVC(void* opcode) {}
-	inline void BVS(void* opcode) {}
+	void AND(void* opcode) {}
+	void ASL(void* opcode) {}
+	void BCC(void* opcode) {}
+	void BCS(void* opcode) {}
+	void BEQ(void* opcode) {}
+	void BIT(void* opcode) {}
+	void BMI(void* opcode) {}
+	void BNE(void* opcode) {}
+	void BPL(void* opcode) {}
+	void BRA(void* opcode) {}
+	void BRK(void* opcode) {}
+	void BRL(void* opcode) {}
+	void BVC(void* opcode) {}
+	void BVS(void* opcode) {}
 
-	inline void CLC(void* opcode)
+	void CLC(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
@@ -673,7 +673,7 @@ public:
 		}
 	}
 
-	inline void CLD(void* opcode)
+	void CLD(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
@@ -701,7 +701,7 @@ public:
 		}
 	}
 
-	inline void CLI(void* opcode)
+	void CLI(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
@@ -729,14 +729,14 @@ public:
 		}
 	}
 
-	inline void CLV(void* opcode) {}
-	inline void CMP(void* opcode) {}
-	inline void COP(void* opcode) {}
-	inline void CPX(void* opcode) {}
-	inline void CPY(void* opcode) {}
-	inline void DEC(void* opcode) {}
+	void CLV(void* opcode) {}
+	void CMP(void* opcode) {}
+	void COP(void* opcode) {}
+	void CPX(void* opcode) {}
+	void CPY(void* opcode) {}
+	void DEC(void* opcode) {}
 
-	inline void DEX(void* opcode)
+	void DEX(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
@@ -791,7 +791,7 @@ public:
 		}
 	}
 
-	inline void DEY(void* opcode)
+	void DEY(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
@@ -847,10 +847,10 @@ public:
 	}
 
 
-	inline void EOR(void* opcode) {}
-	inline void INC(void* opcode) {}
+	void EOR(void* opcode) {}
+	void INC(void* opcode) {}
 
-	inline void INX(void* opcode)
+	void INX(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
@@ -905,7 +905,7 @@ public:
 		}
 	}
 
-	inline void INY(void* opcode)
+	void INY(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
@@ -960,36 +960,36 @@ public:
 		}
 	}
 
-	inline void JML(void* opcode) {}
-	inline void JMP(void* opcode) {}
-	inline void JSL(void* opcode) {}
-	inline void JSR(void* opcode) {}
-	inline void LDA(void* opcode) {}
-	inline void LDX(void* opcode) {}
-	inline void LDY(void* opcode) {}
-	inline void LSR(void* opcode) {}
-	inline void MVN(void* opcode) {}
-	inline void MVP(void* opcode) {}
-	inline void NOP(void* opcode) {}
-	inline void ORA(void* opcode) {}
-	inline void PEA(void* opcode) {}
-	inline void PEI(void* opcode) {}
-	inline void PER(void* opcode) {}
-	inline void PHA(void* opcode) {}
-	inline void PHB(void* opcode) {}
-	inline void PHD(void* opcode) {}
-	inline void PHK(void* opcode) {}
-	inline void PHP(void* opcode) {}
-	inline void PHX(void* opcode) {}
-	inline void PHY(void* opcode) {}
-	inline void PLA(void* opcode) {}
-	inline void PLB(void* opcode) {}
-	inline void PLD(void* opcode) {}
-	inline void PLX(void* opcode) {}
-	inline void PLY(void* opcode) {}
+	void JML(void* opcode) {}
+	void JMP(void* opcode) {}
+	void JSL(void* opcode) {}
+	void JSR(void* opcode) {}
+	void LDA(void* opcode) {}
+	void LDX(void* opcode) {}
+	void LDY(void* opcode) {}
+	void LSR(void* opcode) {}
+	void MVN(void* opcode) {}
+	void MVP(void* opcode) {}
+	void NOP(void* opcode) {}
+	void ORA(void* opcode) {}
+	void PEA(void* opcode) {}
+	void PEI(void* opcode) {}
+	void PER(void* opcode) {}
+	void PHA(void* opcode) {}
+	void PHB(void* opcode) {}
+	void PHD(void* opcode) {}
+	void PHK(void* opcode) {}
+	void PHP(void* opcode) {}
+	void PHX(void* opcode) {}
+	void PHY(void* opcode) {}
+	void PLA(void* opcode) {}
+	void PLB(void* opcode) {}
+	void PLD(void* opcode) {}
+	void PLX(void* opcode) {}
+	void PLY(void* opcode) {}
 
 
-	inline void REP(void* opcode)
+	void REP(void* opcode)
 	{
 		switch (((OPCODE*)opcode)->addressing_mode)
 		{
@@ -1023,14 +1023,14 @@ public:
 		}
 	}
 
-	inline void ROL(void* opcode) {}
-	inline void ROR(void* opcode) {}
-	inline void RTI(void* opcode) {}
-	inline void RTL(void* opcode) {}
-	inline void RTS(void* opcode) {}
-	inline void SBC(void* opcode) {}
+	void ROL(void* opcode) {}
+	void ROR(void* opcode) {}
+	void RTI(void* opcode) {}
+	void RTL(void* opcode) {}
+	void RTS(void* opcode) {}
+	void SBC(void* opcode) {}
 
-	inline void SEP(void* opcode)
+	void SEP(void* opcode)
 	{
 		switch (((OPCODE*)opcode)->addressing_mode)
 		{
@@ -1064,7 +1064,7 @@ public:
 		}
 	}
 
-	inline void SEC(void* opcode)
+	void SEC(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
@@ -1092,7 +1092,7 @@ public:
 		}
 	}
 
-	inline void SED(void* opcode)
+	void SED(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
@@ -1120,7 +1120,7 @@ public:
 		}
 	}
 
-	inline void SEI(void* opcode)
+	void SEI(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
@@ -1148,30 +1148,30 @@ public:
 		}
 	}
 
-	inline void STA(void* opcode) {}
-	inline void STP(void* opcode) {}
-	inline void STX(void* opcode) {}
-	inline void STY(void* opcode) {}
-	inline void STZ(void* opcode) {}
-	inline void TAX(void* opcode) {}
-	inline void TAY(void* opcode) {}
-	inline void TCD(void* opcode) {}
-	inline void TCS(void* opcode) {}
-	inline void TDC(void* opcode) {}
-	inline void TRB(void* opcode) {}
-	inline void TSB(void* opcode) {}
-	inline void TSC(void* opcode) {}
-	inline void TSX(void* opcode) {}
-	inline void TXA(void* opcode) {}
-	inline void TXS(void* opcode) {}
-	inline void TXY(void* opcode) {}
-	inline void TYA(void* opcode) {}
-	inline void TYX(void* opcode) {}
-	inline void WAI(void* opcode) {}
-	inline void WDM(void* opcode) {}
-	inline void XBA(void* opcode) {}
+	void STA(void* opcode) {}
+	void STP(void* opcode) {}
+	void STX(void* opcode) {}
+	void STY(void* opcode) {}
+	void STZ(void* opcode) {}
+	void TAX(void* opcode) {}
+	void TAY(void* opcode) {}
+	void TCD(void* opcode) {}
+	void TCS(void* opcode) {}
+	void TDC(void* opcode) {}
+	void TRB(void* opcode) {}
+	void TSB(void* opcode) {}
+	void TSC(void* opcode) {}
+	void TSX(void* opcode) {}
+	void TXA(void* opcode) {}
+	void TXS(void* opcode) {}
+	void TXY(void* opcode) {}
+	void TYA(void* opcode) {}
+	void TYX(void* opcode) {}
+	void WAI(void* opcode) {}
+	void WDM(void* opcode) {}
+	void XBA(void* opcode) {}
 
-	inline void XCE(void* opcode)
+	void XCE(void* opcode)
 	{
 		switch (instruction_cycles)
 		{
