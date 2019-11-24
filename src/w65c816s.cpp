@@ -95,7 +95,8 @@ void W65C816S::Clock()
 	if (*RESB == 0x00)
 	{
 		reset_low = true;
-		Reset();
+		if (!stp)
+			Reset();
 		return;
 	}
 	else

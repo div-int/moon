@@ -112,30 +112,30 @@ uint32_t Bus::Read(uint32_t address)
 
 void Bus::Run()
 {
-	uint32_t address = 0x00332211;
-	uint32_t data_in = 0xaa55aa55;
-	uint32_t data_out = 0x55aa55aa;
+	uint32_t address;
+	uint32_t data_in;
+	uint32_t data_out;
 
 	while (running)
 	{
 		while (*PHI2 != 0b0) {
 			address = (uint32_t)*A0_A15 | ((uint32_t)(*D0_D7) << 16);
+			data_out = Read(address);
 
 			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
 
-		data_out = Read(address);
-
 		while (*PHI2 == 0b0) {
 			if (*RWB == 0b0)
+			{
 				data_in = *D0_D7;
+				Write(address, data_in);
+			}
 			if (*RWB == 0b1)
 				*D0_D7 = data_out;
 
 			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
-
-		Write(address, data_in);
 	}
 }
 
