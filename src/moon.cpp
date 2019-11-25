@@ -119,7 +119,7 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 	pixel_x_3 = pixel_x_start_3 & 0x3ffffff;
 	pixel_y_3 = pixel_y_start_3 & 0x3ffffff;
 
-	//if (GetKey(olc::Key::SPACE).bReleased)
+	if (GetKey(olc::Key::SPACE).bReleased)
 		*PHI2 = ~(*PHI2);
 
 	if (GetKey(olc::Key::Q).bReleased)

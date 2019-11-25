@@ -190,7 +190,7 @@ public:
 		{"ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr},
 		{"INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr},
 		{"TCS", ADDRESSINGMODES::implied, 2, 1, nullptr},
-		{"TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr},
+		{"JMP", ADDRESSINGMODES::absolute, 3, 3, &W65C816S::JMP},
 		{"ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr},
 		{"ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr},
 		{"ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr},
@@ -209,7 +209,7 @@ public:
 		{"ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr},
 		{"INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr},
 		{"TCS", ADDRESSINGMODES::implied, 2, 1, nullptr},
-		{"TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr},
+		{"JMP", ADDRESSINGMODES::absolute_long, 4, 4, &W65C816S::JMP },
 		{"ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr},
 		{"ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr},
 		{"ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr},
@@ -267,7 +267,7 @@ public:
 		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
 		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
 		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
-		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_x, 4, 3, nullptr },
+		{ "STA", ADDRESSINGMODES::absolute, 4, 3, &W65C816S::STA },
 		{ "ASL", ADDRESSINGMODES::absolute_indexed_with_x, 7, 3, nullptr },
 		{ "ORA", ADDRESSINGMODES::absolute_long_indexed, 5, 4, nullptr },
 
@@ -963,7 +963,117 @@ public:
 	}
 
 	void JML(void* opcode) {}
-	void JMP(void* opcode) {}
+
+	void JMP(void* opcode)
+	{
+		switch (((OPCODE*)opcode)->addressing_mode)
+		{
+		case ADDRESSINGMODES::absolute:
+			switch (instruction_cycles)
+			{
+			case 0:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b1;
+				*VPA = 0b1;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 1:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				immediate_data.b0_7 = data_in;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 2:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				immediate_data.b8_15 = data_in;
+
+				PC.db0_15 = immediate_data.db0_15;
+				address_out = PC;
+
+				instruction_cycles = 0;
+				break;
+			}
+			break;
+
+		case ADDRESSINGMODES::absolute_long:
+			switch (instruction_cycles)
+			{
+			case 0:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b1;
+				*VPA = 0b1;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 1:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				immediate_data.b0_7 = data_in;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 2:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				immediate_data.b8_15 = data_in;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 3:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				PC.db0_15 = immediate_data.db0_15;
+				PC.b16_23 = data_in;
+				address_out = PC;
+
+				instruction_cycles = 0;
+				break;
+			}
+			break;
+
+		}
+	}
+
 	void JSL(void* opcode) {}
 	void JSR(void* opcode) {}
 	void LDA(void* opcode) {}
@@ -1176,7 +1286,149 @@ public:
 		}
 	}
 
-	void STA(void* opcode) {}
+	void STA(void* opcode)
+	{
+		switch (((OPCODE*)opcode)->addressing_mode)
+		{
+		case ADDRESSINGMODES::absolute:
+			switch (instruction_cycles)
+			{
+			case 0:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b1;
+				*VPA = 0b1;
+				*RWB = 0b1;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 1:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+				*RWB = 0b1;
+
+				immediate_data.b0_7 = data_in;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 2:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+				*RWB = 0b1;
+
+				immediate_data.b8_15 = data_in;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 3:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b0;
+				*RWB = 0b0;
+
+				address_out.db0_15 = immediate_data.db0_15;
+				address_out.b16_23 = DBR.b16_23;
+				data_out = A.b0_7;
+
+				if (GetM())
+					instruction_cycles = 0;
+				else
+					++instruction_cycles;
+				break;
+
+			case 4:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b0;
+				*RWB = 0b0;
+
+				++immediate_data.db0_15;
+				address_out.db0_15 = immediate_data.db0_15;
+				address_out.b16_23 = DBR.b16_23;
+				data_out = A.b8_15;
+
+				instruction_cycles = 0;
+				break;
+			}
+			break;
+
+		/*case ADDRESSINGMODES::absolute_long:
+			switch (instruction_cycles)
+			{
+			case 0:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b1;
+				*VPA = 0b1;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 1:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				immediate_data.b0_7 = data_in;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 2:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				immediate_data.b8_15 = data_in;
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+
+			case 3:
+				*VPB = 0b1;
+				*MLB = 0b1;
+				*VDA = 0b0;
+				*VPA = 0b1;
+
+				PC.db0_15 = immediate_data.db0_15;
+				PC.b16_23 = data_in;
+				address_out = PC;
+
+				instruction_cycles = 0;
+				break;
+			}
+			break;*/
+		}
+	}
 
 	void STP(void* opcode)
 	{
@@ -1853,7 +2105,7 @@ public:
 			*VPA = 0b0;
 
 			Register8 B;
-			
+
 			B = A.b8_15;
 			A.b8_15 = A.b0_7;
 			A.b0_7 = B;

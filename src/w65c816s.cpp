@@ -60,7 +60,7 @@ void W65C816S::Reset()
 	if (reset_low_cycles >= 2)
 	{
 		D.tb0_23 = 0x000000;
-		DBR.tb0_23 = 0x000000;
+		DBR.tb0_23 = 0xff0000;
 		S.b8_15 = 0x01;
 		S.b16_23 = 0x00;
 		X.b8_15 = 0x00;
@@ -186,8 +186,8 @@ void W65C816S::Run()
 			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
 
-		/*if (*RWB == 0b0)
-			*D0_D7 = data_out;*/
+		if (*RWB == 0b0)
+			*D0_D7 = data_out;
 		if (*RWB == 0b1)
 			data_in = *D0_D7;
 
