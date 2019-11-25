@@ -561,6 +561,17 @@ public:
 
 	void W65C816S::Debug();
 
+	// Bus in/out function helper
+
+	inline void VPB_MLB_VDA_VPA_RWB(uint1_t vpb, uint1_t mlb, uint1_t vda, uint1_t vpa, uint1_t rwb)
+	{
+		*VPB = vpb;
+		*MLB = mlb;
+		*VDA = vda;
+		*VPA = vpa;
+		*RWB = rwb;
+	}
+
 	// Opcode functions
 
 	void ADC(void* opcode)
@@ -571,10 +582,7 @@ public:
 			switch (instruction_cycles)
 			{
 			case 0:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b1;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 				++PC.db0_15;
 				address_out = PC;
@@ -582,10 +590,7 @@ public:
 
 				break;
 			case 1:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				++PC.db0_15;
 				address_out = PC;
@@ -608,10 +613,7 @@ public:
 				}
 				break;
 			case 2:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				++PC.db0_15;
 				address_out = PC;
@@ -652,10 +654,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -663,10 +662,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			ClearC();
 
@@ -680,10 +676,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -691,10 +684,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			ClearD();
 
@@ -708,10 +698,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -719,10 +706,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			ClearI();
 
@@ -743,10 +727,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -754,10 +735,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			if (GetX())
 			{
@@ -798,10 +776,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -809,10 +784,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			if (GetX())
 			{
@@ -857,10 +829,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -868,10 +837,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			if (GetX())
 			{
@@ -912,10 +878,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -923,10 +886,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			if (GetX())
 			{
@@ -972,10 +932,7 @@ public:
 			switch (instruction_cycles)
 			{
 			case 0:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b1;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 				++PC.db0_15;
 				address_out = PC;
@@ -984,10 +941,7 @@ public:
 				break;
 
 			case 1:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				immediate_data.b0_7 = data_in;
 
@@ -998,10 +952,7 @@ public:
 				break;
 
 			case 2:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				immediate_data.b8_15 = data_in;
 
@@ -1017,10 +968,7 @@ public:
 			switch (instruction_cycles)
 			{
 			case 0:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b1;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 				++PC.db0_15;
 				address_out = PC;
@@ -1029,10 +977,7 @@ public:
 				break;
 
 			case 1:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				immediate_data.b0_7 = data_in;
 
@@ -1043,10 +988,7 @@ public:
 				break;
 
 			case 2:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				immediate_data.b8_15 = data_in;
 
@@ -1057,10 +999,7 @@ public:
 				break;
 
 			case 3:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				PC.db0_15 = immediate_data.db0_15;
 				PC.b16_23 = data_in;
@@ -1088,10 +1027,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1099,10 +1035,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			instruction_cycles = 0;
 			break;
@@ -1135,10 +1068,7 @@ public:
 			switch (instruction_cycles)
 			{
 			case 0:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b1;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 				++PC.db0_15;
 				address_out = PC;
@@ -1146,10 +1076,7 @@ public:
 
 				break;
 			case 1:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				++PC.db0_15;
 				address_out = PC;
@@ -1176,10 +1103,7 @@ public:
 			switch (instruction_cycles)
 			{
 			case 0:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b1;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 				++PC.db0_15;
 				address_out = PC;
@@ -1187,10 +1111,7 @@ public:
 
 				break;
 			case 1:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				++PC.db0_15;
 				address_out = PC;
@@ -1207,10 +1128,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1218,10 +1136,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			SetC();
 
@@ -1235,10 +1150,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1246,10 +1158,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			SetD();
 
@@ -1263,10 +1172,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1274,10 +1180,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			SetI();
 
@@ -1294,11 +1197,7 @@ public:
 			switch (instruction_cycles)
 			{
 			case 0:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b1;
-				*VPA = 0b1;
-				*RWB = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 				++PC.db0_15;
 				address_out = PC;
@@ -1307,11 +1206,7 @@ public:
 				break;
 
 			case 1:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
-				*RWB = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				immediate_data.b0_7 = data_in;
 
@@ -1322,11 +1217,7 @@ public:
 				break;
 
 			case 2:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b1;
-				*RWB = 0b1;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
 
 				immediate_data.b8_15 = data_in;
 
@@ -1337,11 +1228,7 @@ public:
 				break;
 
 			case 3:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b0;
-				*RWB = 0b0;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b0, 0b0);
 
 				address_out.db0_15 = immediate_data.db0_15;
 				address_out.b16_23 = DBR.b16_23;
@@ -1354,11 +1241,7 @@ public:
 				break;
 
 			case 4:
-				*VPB = 0b1;
-				*MLB = 0b1;
-				*VDA = 0b0;
-				*VPA = 0b0;
-				*RWB = 0b0;
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b0, 0b1);
 
 				++immediate_data.db0_15;
 				address_out.db0_15 = immediate_data.db0_15;
@@ -1435,11 +1318,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*RDY = 0b1;
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1447,21 +1326,16 @@ public:
 
 			break;
 		case 1:
-			*RDY = 0b1;
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			++instruction_cycles;
 
 			break;
 		case 2:
 			*RDY = 0b0;
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
+
 			stp = true;
 
 			instruction_cycles = 0;
@@ -1479,10 +1353,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1490,10 +1361,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			if (GetX())
 			{
@@ -1534,10 +1402,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1545,10 +1410,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			if (GetX())
 			{
@@ -1589,10 +1451,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1600,10 +1459,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			D.db0_15 = A.db0_15;
 
@@ -1627,10 +1483,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1638,10 +1491,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			S.db0_15 = A.db0_15;
 
@@ -1655,10 +1505,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1666,10 +1513,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			A.db0_15 = D.db0_15;
 
@@ -1696,10 +1540,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1707,10 +1548,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			A.db0_15 = S.db0_15;
 
@@ -1734,10 +1572,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1745,10 +1580,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			X.db0_15 = S.db0_15;
 
@@ -1772,10 +1604,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1783,10 +1612,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			if (GetM())
 			{
@@ -1827,10 +1653,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1838,10 +1661,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			S.db0_15 = X.db0_15;
 
@@ -1855,10 +1675,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1866,10 +1683,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			if (GetX())
 			{
@@ -1910,10 +1724,7 @@ public:
 		switch (instruction_cycles)
 		{
 		case 0:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b1;
-			*VPA = 0b1;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
 
 			++PC.db0_15;
 			address_out = PC;
@@ -1921,10 +1732,7 @@ public:
 
 			break;
 		case 1:
-			*VPB = 0b1;
-			*MLB = 0b1;
-			*VDA = 0b0;
-			*VPA = 0b0;
+			VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b0, 0b1);
 
 			if (GetM())
 			{
