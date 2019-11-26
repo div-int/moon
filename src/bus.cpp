@@ -71,11 +71,11 @@ std::shared_ptr<uint32_t> Bus::AttachLine32Bit(std::string name)
 }
 
 
-void Bus::Write(uint32_t address, uint32_t data)
+void Bus::Write(uint32_t address, uint8_t data)
 {
 	/*std::cout << "Bus::Write(";
 	std::cout << std::hex << std::setw(4) << std::setfill('0') << address << ", ";
-	std::cout << std::hex << std::setw(4) << std::setfill('0') << data << ")" << std::endl;*/
+	std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(data) << ")" << std::endl;*/
 
 	for (auto const& busDevice : busDevices)
 	{
@@ -84,7 +84,7 @@ void Bus::Write(uint32_t address, uint32_t data)
 	}
 }
 
-uint32_t Bus::Read(uint32_t address)
+uint8_t Bus::Read(uint32_t address)
 {
 	for (const auto& busDevice : busDevices)
 	{
@@ -122,18 +122,22 @@ uint32_t Bus::Read(uint32_t address)
 	if (address == 0x00ff7700)
 		return 0x8d;
 	if (address == 0x00ff7701)
-		return 0x03;
+		return 0x00;
 	if (address == 0x00ff7702)
-		return 0x77;
+		return 0x00;
+
+	if (address == 0x00ff7703)
+		return 0xdb;
+
 
 	return 0xc8;
 }
 
 void Bus::Run()
 {
-	uint32_t address;
-	uint32_t data_in;
-	uint32_t data_out;
+	uint32_t address = 0x00000000;
+	uint32_t data_in = 0x0000005a;
+	uint32_t data_out = 0x000005a;
 
 	while (running)
 	{
@@ -141,7 +145,7 @@ void Bus::Run()
 			address = (uint32_t)*A0_A15 | ((uint32_t)(*D0_D7) << 16);
 			data_out = Read(address);
 
-			std::this_thread::sleep_for(std::chrono::nanoseconds(100000));
+			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
 
 		while (*PHI2 == 0b0) {
@@ -153,7 +157,7 @@ void Bus::Run()
 			if (*RWB == 0b1)
 				*D0_D7 = data_out;
 
-			std::this_thread::sleep_for(std::chrono::nanoseconds(100000));
+			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
 	}
 }

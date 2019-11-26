@@ -7,6 +7,7 @@
 
 #include "bus.h"
 #include "w65c816s.h"
+#include "ram.h"
 
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
@@ -31,6 +32,7 @@ public:
 private:
 	Bus::SharedPtr bus;
 	W65C816S::SharedPtr cpu;
+	Ram::SharedPtr ram;
 
 	Bus::Line1Bit PHI2;
 	Bus::Line1Bit RESB;

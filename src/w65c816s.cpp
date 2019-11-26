@@ -169,34 +169,46 @@ void W65C816S::Run()
 {
 	while (running) // continue to keep running while running is true
 	{
-		// Put the required address valus onto the address bus and data bus
-
-		*A0_A15 = address_out.db0_15;	// put lower 16 bits of address onto address bus
-		*D0_D7 = address_out.b16_23;		// put highest 8 bits of address onto data bus
 
 		// wait while PHI2 is high
 
 		while (*PHI2 != 0b0) {
+			// Put the required address valus onto the address bus and data bus
+
+			*A0_A15 = address_out.db0_15;	// put lower 16 bits of address onto address bus
+			*D0_D7 = address_out.b16_23;		// put highest 8 bits of address onto data bus
+
 			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
 
 		// wait while PHI2 is low
 
 		while (*PHI2 == 0b0) {
+			if (*RWB == 0b0)
+			{
+				/*std::cout << "W65C816S::Run() : data_out = ";
+				std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(data_out) << std::endl;*/
+				*D0_D7 = data_out;
+			}
+			if (*RWB == 0b1)
+			{
+				/*std::cout << "W65C816S::Run() : data_in = ";
+				std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(data_in) << std::endl;*/
+				data_in = *D0_D7;
+			}
+
 			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
 
-		if (*RWB == 0b0)
-			*D0_D7 = data_out;
-		if (*RWB == 0b1)
-			data_in = *D0_D7;
-
-		std::cout << "W65C816S::Run() : ";
-		std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(PC.b16_23) << "/" << std::setw(4) << PC.db0_15;
-		std::cout << " => " << std::hex << std::setw(2) << std::setfill('0') << unsigned(data_in);
-		std::cout << " <= " << std::hex << std::setw(2) << std::setfill('0') << unsigned(data_out);
-		std::cout << " RWB=" << unsigned(*RWB);
-		std::cout << std::endl;
+		if (stp == false && wai == false)
+		{
+			std::cout << "W65C816S::Run() : ";
+			std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(PC.b16_23) << "/" << std::setw(4) << PC.db0_15;
+			std::cout << " => " << std::hex << std::setw(2) << std::setfill('0') << unsigned(data_in);
+			std::cout << " <= " << std::hex << std::setw(2) << std::setfill('0') << unsigned(data_out);
+			std::cout << " RWB=" << unsigned(*RWB);
+			std::cout << std::endl;
+		}
 
 		Clock();
 	}

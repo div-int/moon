@@ -18,8 +18,8 @@ class BusDevice
 public:
 	virtual bool ValidWrite(uint32_t address) = 0;
 	virtual bool ValidRead(uint32_t address) = 0;
-	virtual void Write(uint32_t address, uint32_t data) = 0;
-	virtual uint32_t Read(uint32_t address) = 0;
+	virtual void Write(uint32_t address, uint8_t data) = 0;
+	virtual uint8_t Read(uint32_t address) = 0;
 };
 
 class Bus
@@ -61,8 +61,8 @@ public:
 	Line32Bit CreateLine32Bit(std::string name, uint32_t value);
 	Line32Bit AttachLine32Bit(std::string name);
 
-	void Write(uint32_t address, uint32_t data);
-	uint32_t Read(uint32_t address);
+	void Write(uint32_t address, uint8_t data);
+	uint8_t Read(uint32_t address);
 
 	void Run();
 	void Start();

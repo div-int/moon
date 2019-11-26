@@ -9,9 +9,12 @@ Moon::Moon()
 
 	bus = std::make_shared<Bus>(this);
 	cpu = std::make_shared<W65C816S>(bus, this);
+	ram = std::make_shared<Ram>(this, 0x00ff0000, 0x00ff00ff);
 
 	PHI2 = bus->AttachLine1Bit("PHI2");
 	RESB = bus->AttachLine1Bit("RESB");
+
+	bus->AddDevice(ram);
 }
 
 Moon::~Moon()
@@ -119,7 +122,7 @@ bool Moon::OnUserUpdate(float fElapsedTime)
 	pixel_x_3 = pixel_x_start_3 & 0x3ffffff;
 	pixel_y_3 = pixel_y_start_3 & 0x3ffffff;
 
-	if (GetKey(olc::Key::SPACE).bReleased)
+	//if (GetKey(olc::Key::SPACE).bReleased)
 		*PHI2 = ~(*PHI2);
 
 	if (GetKey(olc::Key::Q).bReleased)
