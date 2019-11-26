@@ -292,16 +292,16 @@ public:
 
 		// 0xa0 - 0xaf
 
-		{ "BPL", ADDRESSINGMODES::program_counter_relative, 2, 2, nullptr },
+		{ "LDY", ADDRESSINGMODES::immediate, 2, 2, &W65C816S::LDY },
 		{ "ORA", ADDRESSINGMODES::direct_indirect_indexed, 5, 2, nullptr },
-		{ "ORA", ADDRESSINGMODES::direct_indirect, 5, 2, nullptr },
+		{ "LDX", ADDRESSINGMODES::immediate, 2, 2, &W65C816S::LDA },
 		{ "ORA", ADDRESSINGMODES::stack_relative_indirect_indexed, 7, 2, nullptr },
 		{ "TRB", ADDRESSINGMODES::direct, 5, 2, nullptr },
 		{ "ORA", ADDRESSINGMODES::direct_indexed_with_x, 4, 2, nullptr },
 		{ "ASL", ADDRESSINGMODES::direct_indexed_with_x, 6, 2, nullptr },
 		{ "ORA", ADDRESSINGMODES::direct_indirect_long_indexed, 6, 2, nullptr },
 		{ "CLC", ADDRESSINGMODES::implied, 2, 1, &W65C816S::CLC },
-		{ "ORA", ADDRESSINGMODES::absolute_indexed_with_y, 4, 3, nullptr },
+		{ "LDA", ADDRESSINGMODES::immediate, 2, 2, &W65C816S::LDA },
 		{ "INC", ADDRESSINGMODES::accumulator, 2, 1, nullptr },
 		{ "TCS", ADDRESSINGMODES::implied, 2, 1, nullptr },
 		{ "TRB", ADDRESSINGMODES::absolute, 6, 3, nullptr },
@@ -1015,9 +1015,175 @@ public:
 
 	void JSL(void* opcode) {}
 	void JSR(void* opcode) {}
-	void LDA(void* opcode) {}
-	void LDX(void* opcode) {}
-	void LDY(void* opcode) {}
+
+	void LDA(void* opcode)
+	{
+		switch (((OPCODE*)opcode)->addressing_mode)
+		{
+		case ADDRESSINGMODES::immediate:
+			switch (instruction_cycles)
+			{
+			case 0:
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+			case 1:
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
+
+				++PC.db0_15;
+				address_out = PC;
+
+				if (GetM()) // 8 bit
+				{
+					A.b0_7 = data_in;
+
+					if (A.b0_7 == 0x00) SetZ();
+					if (A.b0_7 & 0x80) SetN();
+
+					instruction_cycles = 0;
+				}
+				else // 16 bit
+				{
+					immediate_data.db0_15 = data_in;
+					++instruction_cycles;
+				}
+				break;
+			case 2:
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
+
+				++PC.db0_15;
+				address_out = PC;
+
+				immediate_data.b8_15 = data_in;
+
+				A.db0_15 += immediate_data.db0_15;
+
+				if (A.db0_15 == 0x0000) SetZ();
+				if (A.db0_15 & 0x8000) SetN();
+
+				instruction_cycles = 0;
+				break;
+			}
+			break;
+		}
+	}
+
+	void LDX(void* opcode)
+	{
+		switch (((OPCODE*)opcode)->addressing_mode)
+		{
+		case ADDRESSINGMODES::immediate:
+			switch (instruction_cycles)
+			{
+			case 0:
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+			case 1:
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
+
+				++PC.db0_15;
+				address_out = PC;
+
+				if (GetM()) // 8 bit
+				{
+					X.b0_7 = data_in;
+
+					if (X.b0_7 == 0x00) SetZ();
+					if (X.b0_7 & 0x80) SetN();
+
+					instruction_cycles = 0;
+				}
+				else // 16 bit
+				{
+					immediate_data.db0_15 = data_in;
+					++instruction_cycles;
+				}
+				break;
+			case 2:
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
+
+				++PC.db0_15;
+				address_out = PC;
+
+				immediate_data.b8_15 = data_in;
+
+				X.db0_15 += immediate_data.db0_15;
+
+				if (X.db0_15 == 0x0000) SetZ();
+				if (X.db0_15 & 0x8000) SetN();
+
+				instruction_cycles = 0;
+				break;
+			}
+			break;
+		}
+	}
+
+	void LDY(void* opcode)
+	{
+		switch (((OPCODE*)opcode)->addressing_mode)
+		{
+		case ADDRESSINGMODES::immediate:
+			switch (instruction_cycles)
+			{
+			case 0:
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b1, 0b1, 0b1);
+
+				++PC.db0_15;
+				address_out = PC;
+				++instruction_cycles;
+
+				break;
+			case 1:
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
+
+				++PC.db0_15;
+				address_out = PC;
+
+				if (GetM()) // 8 bit
+				{
+					Y.b0_7 = data_in;
+
+					if (Y.b0_7 == 0x00) SetZ();
+					if (Y.b0_7 & 0x80) SetN();
+
+					instruction_cycles = 0;
+				}
+				else // 16 bit
+				{
+					immediate_data.db0_15 = data_in;
+					++instruction_cycles;
+				}
+				break;
+			case 2:
+				VPB_MLB_VDA_VPA_RWB(0b1, 0b1, 0b0, 0b1, 0b1);
+
+				++PC.db0_15;
+				address_out = PC;
+
+				immediate_data.b8_15 = data_in;
+
+				Y.db0_15 += immediate_data.db0_15;
+
+				if (Y.db0_15 == 0x0000) SetZ();
+				if (Y.db0_15 & 0x8000) SetN();
+
+				instruction_cycles = 0;
+				break;
+			}
+			break;
+		}
+	}
+
 	void LSR(void* opcode) {}
 	void MVN(void* opcode) {}
 	void MVP(void* opcode) {}

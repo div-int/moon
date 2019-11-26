@@ -43,7 +43,7 @@ bool Ram::ValidRead(uint32_t address)
 void Ram::Write(uint32_t address, uint8_t data)
 {
 	/*std::cout << "Ram::Write(";
-	std::cout << std::hex << std::setw(4) << std::setfill('0') << address << ", ";
+	std::cout << std::hex << std::setw(6) << std::setfill('0') << address << ", ";
 	std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(data) << ")" << std::endl;*/
 
 	RAM[address - startAddress] = data;

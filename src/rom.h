@@ -30,6 +30,8 @@ public:
 
 	void Reset();
 
+	void Load(std::string filename);
+
 	bool ValidWrite(uint32_t address) override;
 	bool ValidRead(uint32_t address) override;
 	void Write(uint32_t address, uint8_t data) override;

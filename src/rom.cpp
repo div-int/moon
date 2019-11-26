@@ -24,6 +24,29 @@ void Rom::Reset()
 		rom[address] = rand() % 256;
 }
 
+void Rom::Load(std::string filename)
+{
+	std::ifstream romfile;
+
+	romfile.open(filename, std::ios::binary | std::ios::in);
+
+	for (int i = startAddress; (i <= endAddress) && !(romfile.eof()); ++i)
+	{
+		uint8_t c;
+
+		romfile.read((char*)&c, 1);
+
+		if (!romfile.eof())
+		{
+			std::cout << std::hex << std::setw(6) << std::setfill('0') << i << " : ";
+			std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(c) << std::endl;
+
+			rom[i - startAddress] = c;
+		}
+	}
+
+	romfile.close();
+}
 bool Rom::ValidWrite(uint32_t address)
 {
 	return false;
@@ -44,7 +67,7 @@ void Rom::Write(uint32_t address, uint8_t data)
 uint8_t Rom::Read(uint32_t address)
 {
 	/*std::cout << "Rom::Read(";
-	std::cout << std::hex << std::setw(4) << std::setfill('0') << address << ", ";
+	std::cout << std::hex << std::setw(6) << std::setfill('0') << address << ", ";
 	std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(rom[address - startAddress]) << ")" << std::endl;*/
 
 	return rom[address - startAddress];

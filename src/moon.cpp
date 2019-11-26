@@ -9,12 +9,16 @@ Moon::Moon()
 
 	bus = std::make_shared<Bus>(this);
 	cpu = std::make_shared<W65C816S>(bus, this);
-	ram = std::make_shared<Ram>(this, 0x00ff0000, 0x00ff00ff);
+	ram = std::make_shared<Ram>(this, 0x000000, 0x007fff);
+	rom = std::make_shared<Rom>(this, 0x008000, 0x0080ff);
 
 	PHI2 = bus->AttachLine1Bit("PHI2");
 	RESB = bus->AttachLine1Bit("RESB");
 
 	bus->AddDevice(ram);
+	bus->AddDevice(rom);
+
+	rom->Load("E:\\Scott Moore\\Workspace\\github.com\\div-int\\moon\\src\\test.bin");
 }
 
 Moon::~Moon()

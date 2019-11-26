@@ -74,7 +74,7 @@ std::shared_ptr<uint32_t> Bus::AttachLine32Bit(std::string name)
 void Bus::Write(uint32_t address, uint8_t data)
 {
 	/*std::cout << "Bus::Write(";
-	std::cout << std::hex << std::setw(4) << std::setfill('0') << address << ", ";
+	std::cout << std::hex << std::setw(6) << std::setfill('0') << address << ", ";
 	std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(data) << ")" << std::endl;*/
 
 	for (auto const& busDevice : busDevices)
@@ -92,43 +92,9 @@ uint8_t Bus::Read(uint32_t address)
 			return busDevice->Read(address);
 	}
 
-	if (address == 0x0000fffc)
-		return 0x38;
-	if (address == 0x0000fffd)
-		return 0x18;
-	if (address == 0x0000fffe)
-		return 0xfb;
-	if (address == 0x0000ffff)
-		return 0xc2;
-	if (address == 0x00000000)
-		return 0x30;
-	if (address == 0x00000001)
-		return 0x69;
-	if (address == 0x00000002)
-		return 0x34;
-	if (address == 0x00000003)
-		return 0x12;
-	if (address == 0x00000004)
-		return 0xdb;
-	if (address == 0x00000005)
-		return 0x5c;
-	if (address == 0x00000006)
-		return 0x00;
-	if (address == 0x00000007)
-		return 0x77;
-	if (address == 0x00000008)
-		return 0xff;
-
-	if (address == 0x00ff7700)
-		return 0x8d;
-	if (address == 0x00ff7701)
-		return 0x00;
-	if (address == 0x00ff7702)
-		return 0x00;
-
-	if (address == 0x00ff7703)
-		return 0xdb;
-
+	std::cout << "Bus::Read(";
+	std::cout << std::hex << std::setw(6) << std::setfill('0') << address << ") : ";
+	std::cout << " *** failed ***" << std::endl;
 
 	return 0xc8;
 }
@@ -142,13 +108,15 @@ void Bus::Run()
 	while (running)
 	{
 		while (*PHI2 != 0b0) {
+			std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+
 			address = (uint32_t)*A0_A15 | ((uint32_t)(*D0_D7) << 16);
 			data_out = Read(address);
-
-			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
 
 		while (*PHI2 == 0b0) {
+			std::this_thread::sleep_for(std::chrono::nanoseconds(10));
+
 			if (*RWB == 0b0)
 			{
 				data_in = *D0_D7;
@@ -156,8 +124,6 @@ void Bus::Run()
 			}
 			if (*RWB == 0b1)
 				*D0_D7 = data_out;
-
-			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
 	}
 }

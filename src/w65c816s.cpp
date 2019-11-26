@@ -10,7 +10,7 @@ W65C816S::W65C816S(Bus::SharedPtr bus, olc::PixelGameEngine* system)
 	mode = MODE::EMULATION;
 
 	emulation.IRQ.tb0_23 = 0x00fffe;
-	emulation.RESET.tb0_23 = 0x00fffc;
+	emulation.RESET.tb0_23 = 0x008000;
 	emulation.NMI.tb0_23 = 0x00fffa;
 	emulation.ABORT.tb0_23 = 0x00fff8;
 	emulation.BRK.tb0_23 = 0x000000;
@@ -177,8 +177,6 @@ void W65C816S::Run()
 
 			*A0_A15 = address_out.db0_15;	// put lower 16 bits of address onto address bus
 			*D0_D7 = address_out.b16_23;		// put highest 8 bits of address onto data bus
-
-			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
 
 		// wait while PHI2 is low
@@ -196,8 +194,6 @@ void W65C816S::Run()
 				std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(data_in) << std::endl;*/
 				data_in = *D0_D7;
 			}
-
-			std::this_thread::sleep_for(std::chrono::nanoseconds(1000));
 		}
 
 		if (stp == false && wai == false)
